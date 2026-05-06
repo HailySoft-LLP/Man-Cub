@@ -39,7 +39,7 @@
         "enable_sticky_announcement_bar": "desktop-and-mobile",
         "autoplay_enabled": true,
         "autoplay_delay": 4,
-        "color_background": "#000000",
+        "color_background": "#343434",
         "color_text": "#ffffff"
       }
     },
@@ -112,7 +112,7 @@
         "cart_icon": "cart",
         "divider_width": "0px",
         "enable_locale_selector": false,
-        "enable_country_selector": true,
+        "enable_country_selector": false,
         "show_social_media": false,
         "show_social_media_mobile": true,
         "logo": "shopify://shop_images/image.png",

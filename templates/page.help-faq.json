@@ -24,10 +24,8 @@
       "settings": {
         "image": "shopify://shop_images/JNP6995.jpg",
         "desktop_height": 45,
-        "mobile_height": 50,
         "min_height": 400,
         "overlay_opacity": 30,
-        "image_position": "center",
         "date_text": "",
         "date_size": 12,
         "small_text_above": "",
@@ -66,60 +64,6 @@
         "custom_content_width": 700
       }
     },
-    "collapsible_row_list_ymTNgy": {
-      "type": "collapsible-row-list",
-      "blocks": {
-        "item_MFqhKN": {
-          "type": "item",
-          "settings": {
-            "expand_by_default": false,
-            "icon": "none",
-            "title": "What is matching father and son clothing?",
-            "text": "<p>Matching father and son clothing includes coordinated outfits designed for dads and their children to wear together, either as identical pieces or complementary styles.</p>"
-          }
-        },
-        "item_pYEjB3": {
-          "type": "item",
-          "settings": {
-            "expand_by_default": false,
-            "icon": "none",
-            "title": "Are MANCUB outfits identical or coordinated?",
-            "text": "<p>Our pieces are designed to work both ways - wear them as full matching outfits or style them individually while still creating a cohesive look.</p>"
-          }
-        },
-        "item_ADyLQx": {
-          "type": "item",
-          "settings": {
-            "expand_by_default": false,
-            "icon": "none",
-            "title": "What sizes do you offer for matching outfits?",
-            "text": "<p>We offer a full range of sizes for both men and children, making it easy to find the perfect fit for you and your cub.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "item_MFqhKN",
-        "item_pYEjB3",
-        "item_ADyLQx"
-      ],
-      "name": "t:sections.collapsible_row_list.presets.name",
-      "settings": {
-        "title": "FAQ",
-        "heading_tag": "h2",
-        "heading_font_class": "fs-heading-3-base",
-        "heading_alignment": "center",
-        "subheading": "",
-        "subheading_tag": "h3",
-        "subheading_font_class": "fs-heading-5-base",
-        "item_heading_font": "body",
-        "auto_collapse_rows": false,
-        "enable_animation": true,
-        "divider_style": "none",
-        "section_padding": "section--vertical-padding-top-bottom",
-        "content_width": "custom",
-        "custom_content_width": 1000
-      }
-    },
     "multi_column_Hh9RKe": {
       "type": "multi-column",
       "blocks": {
@@ -132,7 +76,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/delivery",
             "small_caption": "",
             "accent": "",
@@ -156,7 +99,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/returns",
             "small_caption": "",
             "accent": "",
@@ -180,7 +122,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://collections/all",
             "small_caption": "",
             "accent": "",
@@ -204,7 +145,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/payment",
             "small_caption": "",
             "accent": "",
@@ -228,7 +168,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/sizing",
             "small_caption": "",
             "accent": "",
@@ -252,7 +191,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/terms-conditions",
             "small_caption": "",
             "accent": "",
@@ -276,7 +214,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/orders",
             "small_caption": "",
             "accent": "",
@@ -300,7 +237,6 @@
             "enable_image_crop_circle": false,
             "focal_point": "image_presentation",
             "image_position": "above_text",
-            "image_alignment": "center",
             "image_link": "shopify://pages/contact",
             "small_caption": "",
             "accent": "",
@@ -348,7 +284,7 @@
         "background_color": "",
         "text_color": "#000000",
         "button_background_color": "#000000",
-        "button_text_color": "#ffffff",
+        "button_text_color": "#FFFFFF",
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-top-bottom"
@@ -359,7 +295,6 @@
     "main",
     "mc_hero_banner_PWhpm3",
     "page_section_M6A6T4",
-    "collapsible_row_list_ymTNgy",
     "multi_column_Hh9RKe"
   ]
 }

@@ -39,24 +39,46 @@
   {%- comment -%} Pre-check stock for all members {%- endcomment -%}
   {%- assign kid_has_stock = false -%}
   {%- if kid_product != blank -%}
-      {%- assign kid_has_stock = true -%} 
+    {%- for variant in kid_product.variants -%}
+      {%- if variant.available -%}
+        {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' or variant.inventory_policy == 'continue' -%}
+          {%- assign kid_has_stock = true -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   {%- endif -%}
 
   {%- assign girl_has_stock = false -%}
   {%- if girl_product != blank -%}
+    {%- for variant in girl_product.variants -%}
+      {%- if variant.available -%}
+        {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' or variant.inventory_policy == 'continue' -%}
           {%- assign girl_has_stock = true -%}
-   
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   {%- endif -%}
 
   {%- assign man_has_stock = false -%}
   {%- if man_product != blank -%}
+    {%- for variant in man_product.variants -%}
+      {%- if variant.available -%}
+        {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' or variant.inventory_policy == 'continue' -%}
           {%- assign man_has_stock = true -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   {%- endif -%}
 
   {%- assign woman_has_stock = false -%}
   {%- if women_product != blank -%}
+    {%- for variant in women_product.variants -%}
+      {%- if variant.available -%}
+        {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' or variant.inventory_policy == 'continue' -%}
           {%- assign woman_has_stock = true -%}
-  
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
   {%- endif -%}
 
   {%- liquid
@@ -72,7 +94,6 @@
     data-family-bundle
     data-money-format="{{ shop.money_format | escape }}"
     data-parent-title="{{ product.title | escape }}"
-    data-parent-handle="{{ product.handle }}"
     {{ block.shopify_attributes }}
     style="
       --bundle-label-size: {{ block.settings.label_font_size | default: 13 }}px;
@@ -96,8 +117,18 @@
     {%- endif -%}
 
     <div class="family-bundle__members" data-bundle-members>
+      {%- assign rendered_roles = '|' -%}
       {%- for role in priority_list -%}
-        {%- case role -%}
+        {%- assign normalized_role = role | strip -%}
+        {%- if normalized_role == 'woman' -%}
+          {%- assign normalized_role = 'women' -%}
+        {%- endif -%}
+        {%- assign role_token = '|' | append: normalized_role | append: '|' -%}
+        {%- if rendered_roles contains role_token -%}
+          {%- continue -%}
+        {%- endif -%}
+        {%- assign rendered_roles = rendered_roles | append: normalized_role | append: '|' -%}
+        {%- case normalized_role -%}
 
           {%- when 'kid' -%}
             {%- if kid_product != blank -%}
@@ -150,7 +181,7 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ kid_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ kid_label }} Size</button>
                   </div>
                 {%- endunless -%}
                 <script type="application/json" data-bundle-variants>[{%- for variant in kid_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
@@ -169,7 +200,7 @@
               {%- endfor -%}
               {%- unless gv -%}{%- assign gv = girl_product.selected_or_first_available_variant | default: girl_product.variants.first -%}{%- endunless -%}
 
-              <div class="family-bundle__member disabled" data-bundle-member="girl">
+              <div class="family-bundle__member" data-bundle-member="girl">
                 <div class="family-bundle__member-header">
                   <div class="family-bundle__member-info">
                     <span class="family-bundle__member-label fs-body-75">{{ girl_label }}</span>
@@ -177,7 +208,7 @@
                   </div>
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ gv.price | money }}</span>
                   <label class="family-bundle__toggle">
-                    <input type="checkbox" data-bundle-toggle>
+                    <input type="checkbox" data-bundle-toggle checked>
                     <span class="family-bundle__toggle-slider"></span>
                   </label>
                 </div>
@@ -208,7 +239,7 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ girl_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ girl_label }} Size</button>
                   </div>
                 {%- endunless -%}
                 <script type="application/json" data-bundle-variants>[{%- for variant in girl_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
@@ -266,7 +297,7 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ man_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ man_label }} Size</button>
                   </div>
                 {%- endunless -%}
                 <script type="application/json" data-bundle-variants>[{%- for variant in man_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
@@ -285,7 +316,7 @@
               {%- endfor -%}
               {%- unless wv -%}{%- assign wv = women_product.selected_or_first_available_variant | default: women_product.variants.first -%}{%- endunless -%}
 
-              <div class="family-bundle__member disabled" data-bundle-member="women">
+              <div class="family-bundle__member" data-bundle-member="women">
                 <div class="family-bundle__member-header">
                   <div class="family-bundle__member-info">
                     <span class="family-bundle__member-label fs-body-75">{{ women_label }}</span>
@@ -293,7 +324,7 @@
                   </div>
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ wv.price | money }}</span>
                   <label class="family-bundle__toggle">
-                    <input type="checkbox" data-bundle-toggle>
+                    <input type="checkbox" data-bundle-toggle checked>
                     <span class="family-bundle__toggle-slider"></span>
                   </label>
                 </div>
@@ -324,7 +355,7 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ women_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ women_label }} Size</button>
                   </div>
                 {%- endunless -%}
                 <script type="application/json" data-bundle-variants>[{%- for variant in women_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>

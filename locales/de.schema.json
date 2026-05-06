@@ -4545,8 +4545,7 @@
             "label": "Empfehlungen zum Anzeigen",
             "options": {
               "collection": "Aus Sammlung",
-              "product_list": "Aus der Produktliste",
-              "metafield": "Aus Metafeld"
+              "product_list": "Aus der Produktliste"
             }
           },
           "cross_sells_show_thumbnails": {
@@ -4560,7 +4559,7 @@
             "content": "Cross-Sells"
           },
           "paragraph": {
-            "content": "Verwenden Sie Cross-Sells, um zusätzliche Produkte aus einer Kollektion, Produktliste oder einem Produkt-Metafeld zu empfehlen."
+            "content": "Verwenden Sie Cross-Sells, um zusätzliche Produkte aus einer Kollektion oder Produktliste zu empfehlen."
           },
           "product_list": {
             "label": "Produktliste"

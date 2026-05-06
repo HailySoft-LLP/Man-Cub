@@ -137,18 +137,6 @@ html:not(.no-js) .navigation__submenu[data-depth="2"] .navigation__submenu-item 
 
 
 .header .icon-button__icon .icon {
-  width: 20px;
-  height: 20px;
-}
-
-/* Mobile PDP spacing fixes */
-@media (max-width: 959px) {
-  .template-product .main-product-section .product {
-    margin-top: 0;
-  }
-
-  .template-product .main-product-section .product__media-container.below-mobile.carousel .swiper-wrapper,
-  .template-product .main-product-section .product__media-container.below-mobile.carousel .product__media-item {
-    align-items: flex-start;
-  }
+    width: 20px;
+    height: 20px;
 }

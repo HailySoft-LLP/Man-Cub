@@ -4545,8 +4545,7 @@
             "label": "Raccomandazioni da mostrare",
             "options": {
               "collection": "Dalla collezione",
-              "product_list": "Dalla lista dei prodotti",
-              "metafield": "Da metafield"
+              "product_list": "Dalla lista dei prodotti"
             }
           },
           "cross_sells_show_thumbnails": {
@@ -4560,7 +4559,7 @@
             "content": "Vendite incrociate"
           },
           "paragraph": {
-            "content": "Usa le vendite incrociate per consigliare prodotti aggiuntivi da una collezione, elenco prodotti o metafield prodotto."
+            "content": "Usa le vendite incrociate per consigliare prodotti aggiuntivi da una collezione o da un elenco di prodotti."
           },
           "product_list": {
             "label": "Elenco prodotti"

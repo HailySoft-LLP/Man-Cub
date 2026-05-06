@@ -4545,8 +4545,7 @@
             "label": "Recommendations to show",
             "options": {
               "collection": "From collection",
-              "product_list": "From product list",
-              "metafield": "From metafield"
+              "product_list": "From product list"
             }
           },
           "cross_sells_show_thumbnails": {
@@ -4560,7 +4559,7 @@
             "content": "Cross sells"
           },
           "paragraph": {
-            "content": "Use cross sells to recommend additional products from a collection, product list, or product metafield."
+            "content": "Use cross sells to recommend additional products from a collection or product list."
           },
           "product_list": {
             "label": "Product list"

@@ -129,13 +129,12 @@
 /* Size picker */
 .family-bundle__size-picker {
   margin-top: 10px;
-  padding-top: 4px;
   transition: opacity 0.3s ease, max-height 0.3s ease;
-  max-height: 500px;
-  overflow: visible;
+  max-height: 300px;
+  overflow: hidden;
 }
 .family-bundle__member.disabled .family-bundle__size-picker {
-  opacity: 0; pointer-events: none; max-height: 0; margin-top: 0; overflow: hidden; padding-top: 0;
+  opacity: 0; pointer-events: none; max-height: 0; margin-top: 0; overflow: hidden;
 }
 .family-bundle__member.disabled .family-bundle__member-header {
   opacity: 1;
@@ -184,12 +183,13 @@
   border-color: var(--color-text);
 }
 .family-bundle__chip.selected {
-  background:#1d212a;
+  background: var(--fb-chip-selected-bg);
   color: var(--fb-chip-selected-color) !important;
-  border-color: #1d212a;
+  border-color: var(--fb-chip-selected-bg);
 }
 .family-bundle__chip.sold-out {
   opacity: 0.25;
+  cursor: not-allowed;
   text-decoration: line-through;
 }
 
@@ -214,6 +214,89 @@
 .sticky-atc-bar [data-add-to-cart].family-bundle__atc-disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.family-bundle__bis-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 40;
+}
+
+.family-bundle__bis-modal.is-open {
+  display: block;
+}
+
+.family-bundle__bis-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.family-bundle__bis-panel {
+  position: relative;
+  width: min(92vw, 420px);
+  margin: 12vh auto 0;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.family-bundle__bis-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.family-bundle__bis-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.family-bundle__bis-copy {
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+.family-bundle__bis-form {
+  display: flex;
+  gap: 8px;
+}
+
+.family-bundle__bis-email {
+  flex: 1;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.family-bundle__bis-submit {
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.family-bundle__bis-feedback {
+  min-height: 18px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #b42318;
+}
+
+.family-bundle__bis-feedback.is-success {
+  color: #027a48;
 }
 
 /* Inline Quantity */

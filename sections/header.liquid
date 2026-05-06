@@ -106,11 +106,6 @@
     endif
   endcapture
 -%}
-{% style %}
-  .header__row .disclosure-form{
-    margin-top:0;
-  }
-{% endstyle %}
 
 {%- capture logo_sizes -%}(max-width: 960px) {{ mobile_logo_width }}px, {{ logo_width }}px{%- endcapture -%}
 
@@ -373,6 +368,7 @@
           {{ secondary_nav }}
         {%- endif -%}
         {{ social_icons }}
+        {{ localization_dropdowns }}
       </div>
     </div>
 
@@ -414,8 +410,6 @@
       {%- endif -%}
 
       <div class="header__row-segment header__row-segment-desktop right">
-          {{ localization_dropdowns }}
-
         {%- unless logo_position == 'center' and navigation_position == 'below' -%}
           {{ search_icon }}
         {%- endunless -%}
