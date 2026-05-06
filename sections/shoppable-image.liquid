@@ -289,8 +289,10 @@
             {%- if section.settings.overlay_heading != blank -%}
               <h2 class="mc-shoppable-overlay__heading">{{ section.settings.overlay_heading }}</h2>
             {%- endif -%}
-            {%- if section.settings.overlay_link_text != blank -%}
+            {%- if section.settings.overlay_link_text != blank and section.settings.overlay_link != null -%}
               <a href="{{ section.settings.overlay_link | default: '#' }}" class="mc-shoppable-overlay__link">{{ section.settings.overlay_link_text }}</a>
+            {%- else -%}
+              <span class="mc-shoppable-overlay__text">{{ section.settings.overlay_link_text }}</span>
             {%- endif -%}
           </div>
         {%- endif -%}

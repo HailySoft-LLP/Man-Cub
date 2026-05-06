@@ -13,25 +13,81 @@
   assign product_limit = settings.cross_sells_max_products
   assign product_count = 0
   assign cart_item_ids = cart.items | map: 'product_id'
+  assign use_metafield_source = false
+  assign metafield_ids_blob = '|'
 
   if settings.cross_sells_recommendations_type == 'collection'
     assign product_pool = settings.collection.products
   elsif settings.cross_sells_recommendations_type == 'product-list'
     assign product_pool = settings.product_list
+  elsif settings.cross_sells_recommendations_type == 'metafield'
+    assign use_metafield_source = true
+    assign product_limit = 3
   endif
 
   assign product_will_show = false
 
-  for item in product_pool
-    if cart_item_ids contains item.id
-      continue
-    elsif item.available == false
-      continue
-    else
-      assign product_will_show = true
-      break
-    endif
-  endfor
+  if use_metafield_source
+    for cart_item in cart.items
+      assign source_product = cart_item.product
+      assign parent_handle = cart_item.properties._bundle_parent_handle
+      assign item_cross_sells = blank
+
+      if source_product != blank
+        if source_product.metafields.custom.cross_sell_product != blank
+          assign item_cross_sells = source_product.metafields.custom.cross_sell_product.value
+        elsif source_product.metafields.custom.cross_sell_products != blank
+          assign item_cross_sells = source_product.metafields.custom.cross_sell_products.value
+        endif
+      endif
+
+      if item_cross_sells == blank and parent_handle != blank and all_products[parent_handle] != blank
+        assign parent_product = all_products[parent_handle]
+        if parent_product.metafields.custom.cross_sell_product != blank
+          assign item_cross_sells = parent_product.metafields.custom.cross_sell_product.value
+        elsif parent_product.metafields.custom.cross_sell_products != blank
+          assign item_cross_sells = parent_product.metafields.custom.cross_sell_products.value
+        endif
+      endif
+
+      if item_cross_sells == blank
+        continue
+      endif
+
+      for item in item_cross_sells
+        if item == blank
+          continue
+        endif
+        assign item_id_token = '|' | append: item.id | append: '|'
+        if metafield_ids_blob contains item_id_token
+          continue
+        elsif cart_item_ids contains item.id
+          continue
+        elsif item.available == false
+          continue
+        else
+          assign metafield_ids_blob = metafield_ids_blob | append: item.id | append: '|'
+          assign product_will_show = true
+          break
+        endif
+      endfor
+
+      if product_will_show
+        break
+      endif
+    endfor
+  else
+    for item in product_pool
+      if cart_item_ids contains item.id
+        continue
+      elsif item.available == false
+        continue
+      else
+        assign product_will_show = true
+        break
+      endif
+    endfor
+  endif
 
   assign is_slider = false
 
@@ -45,92 +101,69 @@
     <div class="cross-sells__heading ff-heading fs-heading-6-base">{{ settings.cross_sells_heading }}</div>
     <div class="cross-sells__items {% if is_slider %}swiper{% endif %}" data-cross-sells-slider="{{ is_slider }}">
       {% if is_slider %}<div class="cross-sells__slider-inner swiper-wrapper">{% endif %}
-      {%- for item in product_pool -%}
-        {%- if product_count >= product_limit -%}
-          {%- break -%}
-        {%- elsif cart_item_ids contains item.id -%}
-          {%- continue -%}
-        {%- elsif item.available == false -%}
-          {%- continue -%}
-        {%- endif -%}
-        {%- assign product_count = product_count | plus: 1 -%}
-        <div class="cross-sells__item {% if is_slider %}swiper-slide{% endif %}">
-          {%- if settings.cross_sells_show_thumbnails -%}
-            <div class="cross-sells__item-image">
-              <a href="{{ item.url }}" class="cross-sells__item-link">
-                {%- render 'image',
-                  image: item.featured_image,
-                  sizes: '64px',
-                  prioritize_loading: true,
-                  aspect_ratio: settings.cart_item_aspect_ratio,
-                  include_placeholder: true
-                -%}
-              </a>
-            </div>
+      {%- if use_metafield_source -%}
+        {%- assign rendered_metafield_ids = '|' -%}
+        {%- for cart_item in cart.items -%}
+          {%- assign source_product = cart_item.product -%}
+          {%- assign parent_handle = cart_item.properties._bundle_parent_handle -%}
+          {%- assign item_cross_sells = blank -%}
+
+          {%- if source_product != blank -%}
+            {%- if source_product.metafields.custom.cross_sell_product != blank -%}
+              {%- assign item_cross_sells = source_product.metafields.custom.cross_sell_product.value -%}
+            {%- elsif source_product.metafields.custom.cross_sell_products != blank -%}
+              {%- assign item_cross_sells = source_product.metafields.custom.cross_sell_products.value -%}
+            {%- endif -%}
           {%- endif -%}
-          <div class="cross-sells__item-content">
-            <div class="cross-sells__item-details ff-body fs-body-75">
-              <h4 class="cross-sells__item-title fs-body-75">
-                <a href="{{ item.url }}">{{ item.title }}</a>
-              </h4>
-              <div class="cross-sells__item-price-wrapper">
-                {% if item.compare_at_price > item.price %}
-                  <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
-                  <s class="t-subdued">
-                    {{- item.compare_at_price | money -}}
-                    {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
-                  </s>
 
-                  {% if item.price_varies %}
-                    {%- assign sale_price = item.price | money -%}
+          {%- if item_cross_sells == blank and parent_handle != blank and all_products[parent_handle] != blank -%}
+            {%- assign parent_product = all_products[parent_handle] -%}
+            {%- if parent_product.metafields.custom.cross_sell_product != blank -%}
+              {%- assign item_cross_sells = parent_product.metafields.custom.cross_sell_product.value -%}
+            {%- elsif parent_product.metafields.custom.cross_sell_products != blank -%}
+              {%- assign item_cross_sells = parent_product.metafields.custom.cross_sell_products.value -%}
+            {%- endif -%}
+          {%- endif -%}
 
-                    <div class="sale">
-                      {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
-                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
-                    </div>
-                  {% else %}
-                    <div class="sale">
-                      {{ item.price | money -}}
-                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif %}
-                    </div>
-                  {% endif %}
-                {% else %}
-                  {% if item.price_varies %}
-                    {%- assign price = item.price | money -%}
-                    {{ 'products.product.from_lowest_price_html' | t: lowest_price: price }}
-                    {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
-                  {% else %}
-                    <span class="cross-sells__item-price">
-                      {{- item.price | money -}}
-                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
-                    </span>
-                  {% endif %}
-                {% endif %}
-              </div>
-            </div>
-            <div class="cross-sells__item-button">
-              <button
-                type="button"
-                class="cross-sells__item-add btn btn--tertiary btn--x-small"
-                data-product-url="{{ item.url }}"
-                {%- if item.has_only_default_variant -%}
-                  data-add-item-id="{{ item.variants[0].id }}"
-                {%- else -%}
-                  data-quick-view-trigger
-                {%- endif -%}
-              >
-                {%- unless section.id == 'quick-cart' -%}
-                  <span class="cross-sells__text-add-to-cart">{{ 'product.add_to_cart' | t }}</span>
-                {%- endunless -%}
-                <span class="cross-sells__text-add">{{ 'cart.general.add' | t }}</span>
-                <div class="btn__loading-wrap">
-                  <div class="btn__loading-bar"></div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      {%- endfor -%}
+          {%- if item_cross_sells == blank -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- for item in item_cross_sells -%}
+            {%- if product_count >= product_limit -%}
+              {%- break -%}
+            {%- endif -%}
+            {%- if item == blank -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- assign item_id_token = '|' | append: item.id | append: '|' -%}
+            {%- if rendered_metafield_ids contains item_id_token -%}
+              {%- continue -%}
+            {%- elsif cart_item_ids contains item.id -%}
+              {%- continue -%}
+            {%- elsif item.available == false -%}
+              {%- continue -%}
+            {%- endif -%}
+            {%- assign rendered_metafield_ids = rendered_metafield_ids | append: item.id | append: '|' -%}
+            {%- assign product_count = product_count | plus: 1 -%}
+            {%- render 'cross-sells-item', item: item, is_slider: is_slider, cart: cart -%}
+          {%- endfor -%}
+          {%- if product_count >= product_limit -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for item in product_pool -%}
+          {%- if product_count >= product_limit -%}
+            {%- break -%}
+          {%- elsif cart_item_ids contains item.id -%}
+            {%- continue -%}
+          {%- elsif item.available == false -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- assign product_count = product_count | plus: 1 -%}
+          {%- render 'cross-sells-item', item: item, is_slider: is_slider, cart: cart -%}
+        {%- endfor -%}
+      {%- endif -%}
       {% if is_slider %}
         </div>
         <button

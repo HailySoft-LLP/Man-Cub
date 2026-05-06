@@ -55,7 +55,7 @@
         "heading_jnMwbJ": {
           "type": "heading",
           "settings": {
-            "title": "Subscribe to our newsletter",
+            "title": "Subscribe to our newsletter - ‘The Inheritance'",
             "heading_tag": "h2",
             "heading_font_class": "fs-heading-3-base"
           }
@@ -63,7 +63,7 @@
         "text_GfCn87": {
           "type": "text",
           "settings": {
-            "text": "<p>Include a short sentence describing what someone can expect from your newsletter.</p>",
+            "text": "<p>Enjoy 10% OFF your first order, plus new drops, styling inspiration, and ideas for time \twell spent with your Cub.</p>",
             "text_font_class": "fs-body-100"
           }
         },
@@ -124,12 +124,12 @@
           "settings": {
             "icon": "moving-truck",
             "icon_width": 38,
-            "icon_width_mobile": 20,
+            "icon_width_mobile": 38,
             "accent": "",
             "heading": "Easy Returns",
             "heading_tag": "h3",
             "heading_font_class": "fs-heading-4-base",
-            "text": "<p>Your exchange ships out as soon as you email us.</p>",
+            "text": "<p>14 days refund or exchange.</p>",
             "text_font_class": "fs-body-75",
             "text_max_width": 100,
             "link": "",
@@ -142,12 +142,12 @@
           "settings": {
             "icon": "globe",
             "icon_width": 38,
-            "icon_width_mobile": 20,
+            "icon_width_mobile": 38,
             "accent": "",
             "heading": "Worldwide Shipping",
             "heading_tag": "h3",
             "heading_font_class": "fs-heading-4-base",
-            "text": "<p>Receive your order around  3-5 days after shipment</p>",
+            "text": "<p>Worn together, anywhere.<br/><br/></p>",
             "text_font_class": "fs-body-75",
             "text_max_width": 100,
             "link": "",
@@ -158,14 +158,15 @@
         "icon_column_EwNdUR": {
           "type": "icon_column",
           "settings": {
-            "icon": "cotton",
+            "icon": "globe",
             "icon_width": 38,
-            "icon_width_mobile": 20,
+            "icon_width_mobile": 38,
+            "custom_icon_image": "shopify://shop_images/uk_1626657_ab173119-bd2c-4bad-a5c6-4e2eca7fe2e8.png",
             "accent": "",
-            "heading": "Atelier Grade",
+            "heading": "Independent UK Brand",
             "heading_tag": "h3",
             "heading_font_class": "fs-heading-4-base",
-            "text": "<p>Made with love, using high-quality premium materials</p>",
+            "text": "<p>Mum-owned. Cub tested.</p>",
             "text_font_class": "fs-body-75",
             "text_max_width": 100,
             "link": "",
@@ -178,12 +179,12 @@
           "settings": {
             "icon": "bill",
             "icon_width": 38,
-            "icon_width_mobile": 20,
+            "icon_width_mobile": 38,
             "accent": "",
-            "heading": "Buy Now, Pay Later",
+            "heading": "Match now. Pay later.",
             "heading_tag": "h3",
             "heading_font_class": "fs-heading-4-base",
-            "text": "<p>Instalments with 0% interest and no extra charges through Shop Pay</p>",
+            "text": "<p>0% interest instalments with Shop Pay.</p>",
             "text_font_class": "fs-body-75",
             "text_max_width": 100,
             "link": "",
@@ -214,7 +215,7 @@
         "columns_mobile": "1",
         "column_spacing_mobile": 20,
         "row_spacing_mobile": 20,
-        "column_alignment_mobile": "left",
+        "column_alignment_mobile": "center",
         "background_behind_columns": false,
         "background_color": "#ffffff",
         "text_color": "#343434",
@@ -237,8 +238,8 @@
             "title": "",
             "show_title_on_desktop": true,
             "text": "",
-            "image": "shopify://shop_images/image.png",
-            "image_max_width": 220,
+            "image": "shopify://shop_images/MANCUB_stacked_with_logo.png",
+            "image_max_width": 100,
             "image_placement": "above_text",
             "show_social_icons": false,
             "enable_follow_on_shop": false
@@ -280,13 +281,13 @@
         "footer-newsletter": {
           "type": "newsletter",
           "settings": {
-            "desktop_width": 25,
+            "desktop_width": 27,
             "desktop_padding": 0,
             "collapse_on_mobile": true,
-            "title": "",
+            "title": "Subscribe to our newsletter - ‘The Inheritance'",
             "show_title_on_desktop": true,
             "enable_collect_customer_name": false,
-            "text": "<p>Subscribe to our ‘Male on Sonday’ </p><p>and get 10% off your first order</p>",
+            "text": "<p>Get 10% off your first order.</p>",
             "show_social_icons": true,
             "enable_follow_on_shop": true
           }

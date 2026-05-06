@@ -12,10 +12,12 @@
     <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>
       {{ fb_product.selected_or_first_available_variant.price | money }}
     </span>
-    <label class="family-bundle__toggle">
-      <input type="checkbox" data-bundle-toggle {% if fb_enabled %}checked{% endif %}>
-      <span class="family-bundle__toggle-slider"></span>
-    </label>
+    <div class="family-bundle__member-actions">
+      <label class="family-bundle__toggle">
+        <input type="checkbox" data-bundle-toggle {% if fb_enabled %}checked{% endif %}>
+        <span class="family-bundle__toggle-slider"></span>
+      </label>
+    </div>
   </div>
 
   {%- unless fb_product.has_only_default_variant -%}

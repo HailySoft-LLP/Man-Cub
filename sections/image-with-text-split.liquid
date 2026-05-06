@@ -35,16 +35,39 @@
 >
   <div class="image-with-text-split__inner">
     <div class="image-with-text-split__image-container">
-      {%- render 'image',
-        wrapper_class: 'image-with-text-split__image',
-        image: section.settings.image,
-        sizes: '(min-width: 960px) 50vw, 100vw',
-        aspect_ratio: section.settings.aspect_ratio,
-        focal_point: section.settings.focal_point,
-        include_placeholder: true,
-        animate: true,
-        prioritize_loading: prioritize_loading
-      -%}
+      {%- if section.settings.image_mobile != blank -%}
+        {%- render 'image',
+          wrapper_class: 'image-with-text-split__image mc-hide-mobile',
+          image: section.settings.image,
+          sizes: '(min-width: 960px) 50vw, 100vw',
+          aspect_ratio: section.settings.aspect_ratio,
+          focal_point: section.settings.focal_point,
+          include_placeholder: true,
+          animate: true,
+          prioritize_loading: prioritize_loading
+        -%}
+        {%- render 'image',
+          wrapper_class: 'image-with-text-split__image mc-hide-desktop',
+          image: section.settings.image_mobile,
+          sizes: '100vw',
+          aspect_ratio: section.settings.aspect_ratio,
+          focal_point: section.settings.focal_point,
+          include_placeholder: true,
+          animate: true,
+          prioritize_loading: prioritize_loading
+        -%}
+      {%- else -%}
+        {%- render 'image',
+          wrapper_class: 'image-with-text-split__image',
+          image: section.settings.image,
+          sizes: '(min-width: 960px) 50vw, 100vw',
+          aspect_ratio: section.settings.aspect_ratio,
+          focal_point: section.settings.focal_point,
+          include_placeholder: true,
+          animate: true,
+          prioritize_loading: prioritize_loading
+        -%}
+      {%- endif -%}
     </div>
     <div class="image-with-text-split__text-container">
       <div class="image-with-text-split__text-container-inner section-blocks animation--section-blocks">
@@ -180,6 +203,12 @@
       "type": "image_picker",
       "id": "image",
       "label": "t:sections.shared.media_with_text.settings.image.image.label"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Mobile image (optional)",
+      "info": "This image will be shown on mobile devices. If not set, the desktop image will be used."
     },
     {
       "type": "select",

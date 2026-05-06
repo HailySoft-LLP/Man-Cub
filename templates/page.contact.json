@@ -57,7 +57,7 @@
         "heading": "Contact Us",
         "heading_tag": "h2",
         "heading_font_class": "fs-heading-2-base",
-        "text": "<p>We're here to help</p>",
+        "text": "<p>Let’s Talk Man to MANCUB</p><p>We’re here to help.</p>",
         "show_recaptcha_terms": true,
         "enable_animation": true,
         "divider_style": "none",
@@ -91,6 +91,10 @@
       ],
       "settings": {
         "alignment": "center_center",
+        "bg_color": "",
+        "text_color": "",
+        "custom_font_family": "",
+        "custom_font_size": 0,
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-top-bottom",
@@ -177,7 +181,9 @@
           "settings": {
             "link": "",
             "link_text": "View all FAQ",
-            "button_style": "btn--primary"
+            "button_style": "btn--primary",
+            "button_bg_color": "",
+            "button_text_color": ""
           }
         },
         "spacer": {
@@ -194,6 +200,10 @@
       ],
       "settings": {
         "alignment": "center_center",
+        "bg_color": "",
+        "text_color": "",
+        "custom_font_family": "",
+        "custom_font_size": 0,
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-none",

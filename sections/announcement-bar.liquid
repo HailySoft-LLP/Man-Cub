@@ -6,6 +6,8 @@
 {%- if section.blocks.size -%}
   {%- capture items -%}
     {%- for block in section.blocks -%}
+      {%- assign base_cents = settings.free_shipping_threshold | times: 100 -%}
+      {%- assign amount_span = '<span class="js-announcement-amount" data-base-cents="' | append: base_cents | append: '"></span>' -%}
       <div
         class="announcement-bar__item ff-body fs-body-50 swiper-slide"
         {% unless forloop.first %}
@@ -18,13 +20,15 @@
         {%- assign has_mobile_text = false -%}
         {%- if block.settings.title_mobile != blank and block.settings.title_mobile != block.settings.title -%}
           {%- assign has_mobile_text = true -%}
+          {%- assign title_mobile = block.settings.title_mobile | replace: '|amount|', amount_span -%}
+
           <div class="announcement-bar__item-inner announcement-bar__item-inner-mobile-only">
             {%- if block.settings.link != blank -%}
               <a class="announcement-bar__link color-inherit" href="{{ block.settings.link }}">
-                {{ block.settings.title_mobile | replace: '<a ', '<span class="fake-link" ' | replace: '</a>', '</span>' }}
+                {{ title_mobile | replace: '<a ', '<span class="fake-link" ' | replace: '</a>', '</span>' }}
               </a>
             {%- else -%}
-              {{ block.settings.title_mobile }}
+              {{ title_mobile }}
             {%- endif -%}
           </div>
         {%- endif -%}
@@ -34,7 +38,7 @@
               {{ block.settings.title | replace: '<a ', '<span class="fake-link" ' | replace: '</a>', '</span>' }}
             </a>
           {%- else -%}
-            {{ block.settings.title }}
+            {{ block.settings.title | replace: '|amount|', amount_span }}
           {%- endif -%}
         </div>
       </div>
@@ -85,6 +89,56 @@
     </div>
   </div>
 {%- endif -%}
+
+<script>
+  (function() {
+    // Format cents using the active currency's money format from window.theme.moneyFormat
+    function announcementFormatMoney(cents) {
+      var format = (window.theme && window.theme.moneyFormat) ? window.theme.moneyFormat : '{{amount}}';
+      if (typeof cents === 'string') cents = cents.replace('.', '');
+      var value = '';
+      var placeholderRegex = /\{\{\s*(\w+)\s*\}\}/;
+      function formatWithDelimiters(number, precision, thousands, decimal) {
+        precision = precision !== undefined ? precision : 2;
+        thousands = thousands !== undefined ? thousands : ',';
+        decimal = decimal !== undefined ? decimal : '.';
+        if (isNaN(number) || number == null) return 0;
+        number = (number / 100.0).toFixed(precision);
+        var parts = number.split('.');
+        var dollars = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + thousands);
+        return dollars + (parts[1] ? decimal + parts[1] : '');
+      }
+      var match = format.match(placeholderRegex);
+      if (!match) return cents;
+      switch (match[1]) {
+        case 'amount':                              value = formatWithDelimiters(cents, 2); break;
+        case 'amount_no_decimals':                  value = formatWithDelimiters(cents, 0); break;
+        case 'amount_with_comma_separator':         value = formatWithDelimiters(cents, 2, '.', ','); break;
+        case 'amount_no_decimals_with_comma_separator': value = formatWithDelimiters(cents, 0, '.', ','); break;
+        case 'amount_with_apostrophe_separator':    value = formatWithDelimiters(cents, 2, "'", '.'); break;
+        case 'amount_no_decimals_with_space_separator': value = formatWithDelimiters(cents, 0, ' ', ','); break;
+        case 'amount_with_space_separator':         value = formatWithDelimiters(cents, 2, ' ', ','); break;
+        case 'amount_with_period_and_space_separator': value = formatWithDelimiters(cents, 2, ' ', '.'); break;
+        default:                                    value = formatWithDelimiters(cents, 2); break;
+      }
+      return format.replace(placeholderRegex, value);
+    }
+
+    function updateAnnouncementBarAmount() {
+      // window.Shopify.currency.rate is GBP → active currency (since shop base = GBP)
+      var rate = (window.Shopify && window.Shopify.currency && window.Shopify.currency.rate)
+        ? parseFloat(window.Shopify.currency.rate)
+        : 1;
+      document.querySelectorAll('.js-announcement-amount').forEach(function(span) {
+        var baseCents = parseInt(span.getAttribute('data-base-cents'), 10);
+        var converted = Math.round(baseCents * rate);
+        span.textContent = announcementFormatMoney(converted);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', updateAnnouncementBarAmount);
+  })();
+</script>
 
 {% schema %}
 {

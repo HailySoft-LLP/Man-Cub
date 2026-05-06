@@ -71,6 +71,7 @@
         },
         "hotspot_WMTNwM": {
           "type": "hotspot",
+          "disabled": true,
           "settings": {
             "product_item": "mancub-beanie-hats",
             "horizontal_position": 73,
@@ -83,6 +84,7 @@
         },
         "hotspot_ifjWhg": {
           "type": "hotspot",
+          "disabled": true,
           "settings": {
             "product_item": "quilted-hoodies-in-chocolate-brown",
             "horizontal_position": 57,
@@ -99,6 +101,9 @@
         "hotspot_WMTNwM",
         "hotspot_ifjWhg"
       ],
+      "custom_css": [
+        ".mc-shoppable-overlay__heading {margin: 0;}"
+      ],
       "name": "t:sections.shoppable_image.presets.name",
       "settings": {
         "layout_width": "full",
@@ -107,8 +112,8 @@
         "image": "shopify://shop_images/ManCub-Shoot-Manchester-7553-1_7eb95a4f-3951-4411-b191-9a3f31b5f2ef.jpg",
         "mobile_image": "shopify://shop_images/Gemini_Generated_Image_s5sj6ds5sj6ds5sj.png",
         "aspect_ratio": "natural",
-        "overlay_heading": "",
-        "overlay_link_text": "",
+        "overlay_heading": "MANCUB",
+        "overlay_link_text": "STYLE INHERITED",
         "overlay_link": "",
         "overlay_position": "bottom-left",
         "heading": "",
@@ -190,13 +195,14 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/ManCub-Shoot-Manchester-7553-1_b25035b7-bcdd-4764-9dcd-de196c947624.jpg",
+            "image_mobile": "shopify://shop_images/2.4.png",
             "focal_point": "image_presentation",
             "mobile_focal_point": "image_presentation",
             "media_link": "",
             "text_position": "flex-start_flex-end",
             "text_position_mobile": "center_flex-end",
             "accent": "",
-            "title": "Style Inherited",
+            "title": "Being MANCUB",
             "heading_tag": "h2",
             "heading_font_class": "fs-heading-display-2",
             "subheading": "",
@@ -205,8 +211,8 @@
             "text": "",
             "text_font_class": "fs-body-100",
             "link_1": "shopify://collections/new-in",
-            "link_text_1": "SHOP ALL PRODUCTS",
-            "button_style_1": "btn--primary",
+            "link_text_1": "",
+            "button_style_1": "btn--secondary",
             "link_2": "",
             "link_text_2": "Read more",
             "button_style_2": "btn--primary",
@@ -222,22 +228,23 @@
           "type": "slide",
           "settings": {
             "image": "shopify://shop_images/063C9932-852E-4230-A354-344B9E53296B-1635-000000E2BF038924-scaled-e1611092166615_5c207213-85a7-4b91-8f6c-7dda89a7bee7.jpg",
+            "image_mobile": "shopify://shop_images/2.5.jpg",
             "focal_point": "image_presentation",
             "mobile_focal_point": "image_presentation",
             "media_link": "",
             "text_position": "flex-start_flex-end",
             "text_position_mobile": "center_flex-end",
             "accent": "",
-            "title": "Style Inherited",
+            "title": "Being MANCUB",
             "heading_tag": "h2",
             "heading_font_class": "fs-heading-display-2",
             "subheading": "",
             "subheading_tag": "h2",
-            "subheading_font_class": "fs-heading-5-base",
+            "subheading_font_class": "fs-heading-4-base",
             "text": "",
             "text_font_class": "fs-body-100",
             "link_1": "shopify://collections",
-            "link_text_1": "SHOP ALL PRODUCTS",
+            "link_text_1": "",
             "button_style_1": "btn--secondary",
             "link_2": "",
             "link_text_2": "Read more",
@@ -249,11 +256,147 @@
             "color_overlay_gradient": "",
             "overlay_opacity": 0
           }
+        },
+        "slide_9dCJBj": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/KB1_0182_1_d11d34b3-d68b-4ce1-a06f-998d33b161be.jpg",
+            "image_mobile": "shopify://shop_images/2.3.jpg",
+            "focal_point": "image_presentation",
+            "mobile_focal_point": "image_presentation",
+            "media_link": "",
+            "text_position": "flex-start_flex-end",
+            "text_position_mobile": "center_flex-end",
+            "accent": "",
+            "title": "Being MANCUB",
+            "heading_tag": "h2",
+            "heading_font_class": "fs-heading-display-2",
+            "subheading": "",
+            "subheading_tag": "h2",
+            "subheading_font_class": "fs-heading-5-base",
+            "text": "",
+            "text_font_class": "fs-body-100",
+            "link_1": "shopify://collections/new-in",
+            "link_text_1": "",
+            "button_style_1": "btn--primary",
+            "link_2": "",
+            "link_text_2": "Read more",
+            "button_style_2": "btn--primary",
+            "text_color": "#ffffff",
+            "button_background_color": "#343434",
+            "button_text_color": "#ffffff",
+            "color_overlay": "#000000",
+            "color_overlay_gradient": "",
+            "overlay_opacity": 0
+          }
+        },
+        "slide_X87bDA": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/KB1_0023_1.jpg",
+            "image_mobile": "shopify://shop_images/KB1_0151_1_1.jpg",
+            "focal_point": "image_presentation",
+            "mobile_focal_point": "image_presentation",
+            "media_link": "",
+            "text_position": "flex-start_flex-end",
+            "text_position_mobile": "center_flex-end",
+            "accent": "",
+            "title": "Being MANCUB",
+            "heading_tag": "h2",
+            "heading_font_class": "fs-heading-display-2",
+            "subheading": "",
+            "subheading_tag": "h2",
+            "subheading_font_class": "fs-heading-5-base",
+            "text": "",
+            "text_font_class": "fs-body-100",
+            "link_1": "shopify://collections/new-in",
+            "link_text_1": "",
+            "button_style_1": "btn--primary",
+            "link_2": "",
+            "link_text_2": "Read more",
+            "button_style_2": "btn--primary",
+            "text_color": "#ffffff",
+            "button_background_color": "#343434",
+            "button_text_color": "#ffffff",
+            "color_overlay": "#000000",
+            "color_overlay_gradient": "",
+            "overlay_opacity": 0
+          }
+        },
+        "slide_K473GF": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/KB1_0680_1.jpg",
+            "image_mobile": "shopify://shop_images/KB1_0501_1.jpg",
+            "focal_point": "image_presentation",
+            "mobile_focal_point": "image_presentation",
+            "media_link": "",
+            "text_position": "flex-start_flex-end",
+            "text_position_mobile": "center_flex-end",
+            "accent": "",
+            "title": "Being MANCUB",
+            "heading_tag": "h2",
+            "heading_font_class": "fs-heading-display-2",
+            "subheading": "",
+            "subheading_tag": "h2",
+            "subheading_font_class": "fs-heading-5-base",
+            "text": "",
+            "text_font_class": "fs-body-100",
+            "link_1": "shopify://collections/new-in",
+            "link_text_1": "",
+            "button_style_1": "btn--primary",
+            "link_2": "",
+            "link_text_2": "Read more",
+            "button_style_2": "btn--primary",
+            "text_color": "#ffffff",
+            "button_background_color": "#343434",
+            "button_text_color": "#ffffff",
+            "color_overlay": "#000000",
+            "color_overlay_gradient": "",
+            "overlay_opacity": 0
+          }
+        },
+        "slide_W8fEfm": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/KB1_0436_1.jpg",
+            "image_mobile": "shopify://shop_images/KB1_1221_1.jpg",
+            "focal_point": "image_presentation",
+            "mobile_focal_point": "image_presentation",
+            "media_link": "",
+            "text_position": "flex-start_flex-end",
+            "text_position_mobile": "center_flex-end",
+            "accent": "",
+            "title": "Being MANCUB",
+            "heading_tag": "h2",
+            "heading_font_class": "fs-heading-display-2",
+            "subheading": "",
+            "subheading_tag": "h2",
+            "subheading_font_class": "fs-heading-5-base",
+            "text": "",
+            "text_font_class": "fs-body-100",
+            "link_1": "shopify://collections/new-in",
+            "link_text_1": "",
+            "button_style_1": "btn--primary",
+            "link_2": "",
+            "link_text_2": "Read more",
+            "button_style_2": "btn--primary",
+            "text_color": "#ffffff",
+            "button_background_color": "#343434",
+            "button_text_color": "#ffffff",
+            "color_overlay": "#000000",
+            "color_overlay_gradient": "",
+            "overlay_opacity": 0
+          }
         }
       },
       "block_order": [
         "slide_Pbrxa3",
-        "slide_fLcWXV"
+        "slide_fLcWXV",
+        "slide_9dCJBj",
+        "slide_X87bDA",
+        "slide_K473GF",
+        "slide_W8fEfm"
       ],
       "name": "t:sections.slideshow.presets.name",
       "settings": {
@@ -379,7 +522,7 @@
         "spacer-1": {
           "type": "spacer",
           "settings": {
-            "space": 28
+            "space": 64
           }
         },
         "accent": {
@@ -397,19 +540,42 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "title": "Our effortless yet distinctive pieces are designed to be mixed & matched, worn together to transform an outfit into an art of functional self-expression.",
+            "title": "MATCHING OUTFITS. <br>DESIGNED PROPERLY. <br>No compromise on quality or style.",
             "heading_tag": "h2",
             "heading_font_class": "fs-heading-1-base"
           }
         },
+        "subheading_ajtVx9": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "CUBS copy what they love - we make it worth copying.",
+            "subheading_tag": "h3",
+            "subheading_font_class": "fs-heading-5-base"
+          }
+        },
+        "subheading_c8tApr": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Made for shared style, real connection and MANCUB moments",
+            "subheading_tag": "h3",
+            "subheading_font_class": "fs-heading-5-base"
+          }
+        },
         "button": {
           "type": "button",
+          "disabled": true,
           "settings": {
             "link": "",
             "link_text": "Read more",
             "button_style": "btn--callout",
             "button_bg_color": "",
             "button_text_color": "#ffffff"
+          }
+        },
+        "spacer_kk8FQp": {
+          "type": "spacer",
+          "settings": {
+            "space": 64
           }
         }
       },
@@ -418,7 +584,13 @@
         "accent",
         "spacer-2",
         "heading",
-        "button"
+        "subheading_ajtVx9",
+        "subheading_c8tApr",
+        "button",
+        "spacer_kk8FQp"
+      ],
+      "custom_css": [
+        ".rich-text__subheading {font-family: \"Roboto Mono Light\"; font-weight: 400;}"
       ],
       "settings": {
         "alignment": "left_left",
@@ -472,6 +644,7 @@
         "text_zRAzNj",
         "button_PzD9Dp"
       ],
+      "disabled": true,
       "name": "t:sections.image_hero.presets.name",
       "settings": {
         "image_aspect": "custom",
@@ -499,7 +672,7 @@
         "collection_aTze4Q": {
           "type": "collection",
           "settings": {
-            "collection": "tops",
+            "collection": "best-sellers",
             "collection_name": "BEST SELLERS",
             "show_view_all": true
           }
@@ -550,7 +723,7 @@
         "accent": {
           "type": "accent",
           "settings": {
-            "accent": "NEW"
+            "accent": "TRENDING"
           }
         },
         "heading": {
@@ -564,7 +737,7 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>The perfect collection for a fall look. Bring on the layers and the neutral color palette for a stylish look. Unparalleled versatility. </p>",
+            "text": "<p>Going on holiday? Great. It's the best time to match up. You'll find everything you need for Man & Cub here. Hoodies for the airport, swim shorts for the pool, shades for the beach, and shirts for dinner. We've got it all!</p>",
             "text_font_class": "fs-body-100"
           }
         }
@@ -578,7 +751,8 @@
         "image_aspect": "custom",
         "desktop_height": 80,
         "mobile_height": 50,
-        "image": "shopify://shop_images/ManCub-Shoot-Manchester-7616.jpg",
+        "image": "shopify://shop_images/KB1_0174_1.jpg",
+        "image_mobile": "shopify://shop_images/KB1_0101_1.jpg",
         "focal_point": "center",
         "mobile_focal_point": "image_presentation",
         "media_link": "shopify://collections/holiday-shop",
@@ -682,7 +856,7 @@
         "accent_xdM4QU": {
           "type": "accent",
           "settings": {
-            "accent": "Accent"
+            "accent": "Special Occasions"
           }
         },
         "heading_ULaBmy": {
@@ -696,7 +870,7 @@
         "text_EEzfTz": {
           "type": "text",
           "settings": {
-            "text": "<p>Use these sections to promote a particular feature with editorial photography.</p>",
+            "text": "<p>For birthdays, Father’s Day, and everything in between. They’ll love it.</p>",
             "text_font_class": "fs-body-100"
           }
         }
@@ -711,7 +885,7 @@
         "image_position": "right",
         "image_mobile_position": "above-content",
         "image_padding": "none",
-        "image": "shopify://shop_images/ManCub-Shoot-Manchester-7553-1_7eb95a4f-3951-4411-b191-9a3f31b5f2ef.jpg",
+        "image": "shopify://shop_images/KB1_0023_1_a808f440-4c41-4f04-9301-eb414fac4a97.jpg",
         "aspect_ratio": "landscape",
         "focal_point": "image_presentation",
         "content_alignment": "left",
@@ -797,7 +971,7 @@
         "heading_tag": "h2",
         "subheading": "",
         "link": "shopify://pages/shop-the-look",
-        "link_text": "Shop The Looks",
+        "link_text": "Shop More Looks",
         "button_style": "btn--callout",
         "enable_animation": true,
         "divider_style": "solid",
@@ -1094,11 +1268,11 @@
             "heading": "",
             "heading_tag": "h2",
             "heading_font_class": "fs-heading-2-base",
-            "text": "<p>MANCUB’s concept is simple. We believe that for Father & Son, Uncle & Nephew, or any other Man & Cub combination, matching outfits shouldn’t require compromise on quality and style.</p>",
+            "text": "<p>Conceived in 2017. Born in 2018. Manchester, UK<br/>An independent brand founded by Dominique Morton. Built for the Man who shows up, and the Cubs who copy them</p>",
             "text_font_class": "fs-body-300",
             "text_max_width": 100,
-            "link": "",
-            "link_text": "Learn More",
+            "link": "shopify://pages/about-mancub",
+            "link_text": "Read Our Story",
             "button_style": "btn--callout"
           }
         },

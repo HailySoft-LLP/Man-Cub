@@ -17,7 +17,15 @@
         "announcement-bar-1": {
           "type": "announcement",
           "settings": {
-            "title": "<p>Welcome to Stiletto</p>",
+            "title": "<p>MANCUB</p>",
+            "title_mobile": "",
+            "link": ""
+          }
+        },
+        "announcement_HW3c9q": {
+          "type": "announcement",
+          "settings": {
+            "title": "<p>Shop for Father's Day 21st June</p>",
             "title_mobile": "",
             "link": ""
           }
@@ -25,21 +33,22 @@
         "5a2005ed-4438-4c3e-9549-f61724bea26f": {
           "type": "announcement",
           "settings": {
-            "title": "<p>Free shipping on orders over $250</p>",
-            "title_mobile": "",
+            "title": "<p>Free shipping on orders over |amount|</p>",
+            "title_mobile": "<p>|amount| is free shipping</p>",
             "link": ""
           }
         }
       },
       "block_order": [
         "announcement-bar-1",
+        "announcement_HW3c9q",
         "5a2005ed-4438-4c3e-9549-f61724bea26f"
       ],
       "settings": {
         "enable_sticky_announcement_bar": "desktop-and-mobile",
         "autoplay_enabled": true,
         "autoplay_delay": 4,
-        "color_background": "#343434",
+        "color_background": "#000000",
         "color_text": "#ffffff"
       }
     },
@@ -112,12 +121,12 @@
         "cart_icon": "cart",
         "divider_width": "0px",
         "enable_locale_selector": false,
-        "enable_country_selector": false,
+        "enable_country_selector": true,
         "show_social_media": false,
         "show_social_media_mobile": true,
-        "logo": "shopify://shop_images/image.png",
-        "logo_width": 180,
-        "mobile_logo_width": 100,
+        "logo": "shopify://shop_images/MANCUB_EMBELLEM_white_trsp_1_1.png",
+        "logo_width": 40,
+        "mobile_logo_width": 30,
         "menu": "",
         "hamburger_menu": "main-menu-copy",
         "featured_link_label": "",

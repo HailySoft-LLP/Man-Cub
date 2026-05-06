@@ -63,7 +63,7 @@
         "text_86QmyN": {
           "type": "text",
           "settings": {
-            "text": "<p>MANCUB’s concept is simple. We believe that for Father & Son, Uncle & Nephew, or any other Man & Cub combination, matching outfits shouldn’t require compromise on quality and style.<br/><br/>…But being MANCUB is so much more than just matching clothes. It’s that special, and unique bond between Man & Cub. MANCUB Men are proud of their Cub’s. We’re just proud to style them and let them wear that pride on their sleeves.<br/><br/>Be it Man, Cub, Mum, or a random onlooker, there’s guaranteed smiles all round when you’re ‘Being MANCUB’.<br/><br/>Further down this page you can read about our principles and our story, but first, a note on our future. Just like your Cubs, our future is in your hands and we’ll be moulded by your guidance…so please let us know what you like, what you don’t, and what products you’d like to see next. You can do that </p>",
+            "text": "<p>MANCUB’s concept is simple. We believe that for Father & Son, Uncle & Nephew, or any other Man & Cub combination, matching outfits shouldn’t require compromise on quality and style.<br/><br/>…But being MANCUB is so much more than just matching clothes. It’s that special, and unique bond between Man & Cub. MANCUB Men are proud of their Cub’s. We’re just proud to style them and let them wear that pride on their sleeves.<br/><br/>Be it Man, Cub, Mum, or a random onlooker, there’s guaranteed smiles all round when you’re ‘Being MANCUB’.<br/><br/>Further down this page you can read about our principles and our story, but first, a note on our future. Just like your Cubs, our future is in your hands and we’ll be moulded by your guidance…so please let us know what you like, what you don’t, and what products you’d like to see next. You can do that <a href=\"/pages/contact\" target=\"_blank\" title=\"Contact\">here</a>.</p>",
             "text_font_class": "fs-body-100"
           }
         }
@@ -75,6 +75,10 @@
       "name": "t:sections.rich_text.presets.name",
       "settings": {
         "alignment": "center_center",
+        "bg_color": "",
+        "text_color": "",
+        "custom_font_family": "",
+        "custom_font_size": 0,
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-top-bottom",
@@ -229,6 +233,10 @@
       "name": "t:sections.rich_text.presets.name",
       "settings": {
         "alignment": "center_center",
+        "bg_color": "",
+        "text_color": "",
+        "custom_font_family": "",
+        "custom_font_size": 0,
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-bottom-only",

@@ -4545,7 +4545,8 @@
             "label": "Recommandations à afficher",
             "options": {
               "collection": "De la collection",
-              "product_list": "De la liste de produits"
+              "product_list": "De la liste de produits",
+              "metafield": "Depuis un métachamp"
             }
           },
           "cross_sells_show_thumbnails": {
@@ -4559,7 +4560,7 @@
             "content": "Ventes croisées"
           },
           "paragraph": {
-            "content": "Utilisez les ventes croisées pour recommander des produits supplémentaires à partir d'une collection ou d'une liste de produits."
+            "content": "Utilisez les ventes croisées pour recommander des produits supplémentaires depuis une collection, une liste de produits ou un métachamp produit."
           },
           "product_list": {
             "label": "Liste de produits"

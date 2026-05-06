@@ -87,17 +87,12 @@
           <a href="{{ product_item.url }}" class="mc-shoppable-card__title">{{ product_item.title }}</a>
           <div class="mc-shoppable-card__bottom-row">
             <span class="mc-shoppable-card__price">{{ si_price | money }}</span>
-            {%- if product_item.available -%}
-              <form method="post" action="/cart/add" class="mc-shoppable-card__atc-form" data-mc-shoppable-atc>
-                <input type="hidden" name="id" value="{{ product_item.selected_or_first_available_variant.id }}">
-                <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="mc-shoppable-card__atc">+ Add to Bag</button>
-              </form>
-            {%- endif -%}
+            <a href="{{ product_item.url }}" class="mc-shoppable-card__atc" style="background:none;border:none;padding:0;margin-right:6px;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;">View</a>
           </div>
         </div>
       </div>
     </div>
+
 
     <style>
       /* + icon hotspot — override base theme dot */
@@ -229,7 +224,7 @@
         font-family: inherit;
         font-size: 10px;
         font-weight: 600;
-        text-transform: uppercase;
+        text-transform: none;
         letter-spacing: 0.06em;
         color: #555;
         padding: 0;

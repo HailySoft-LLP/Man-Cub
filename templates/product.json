@@ -15,7 +15,7 @@
       "settings": {
         "custom_liquid": "<script type=\"text/javascript\">\n//<![CDATA[\nwindow.lipscoreInit = function() {\n  lipscore.init({\n    apiKey: \"889c3f3e4b6ac67269261324\"\n  });\n};\n(function() {\n  var scr = document.createElement('script'); scr.async = 1;\n  scr.src = \"//static.lipscore.com/assets/no/lipscore-v1.js\";\n  document.getElementsByTagName('head')[0].appendChild(scr);\n})();\n//]]>\n</script>",
         "divider_style": "none",
-        "section_padding": "section--vertical-padding-top-bottom"
+        "section_padding": "section--vertical-padding-none"
       }
     },
     "main": {

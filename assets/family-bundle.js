@@ -28,15 +28,14 @@ window._familyBundleLoaded = true;
     if (!bundle) return;
 
     var parentTitle = bundle.getAttribute('data-parent-title') || 'Family Bundle';
+    var parentHandle = bundle.getAttribute('data-parent-handle') || '';
     var totalPriceEl = bundle.querySelector('[data-bundle-total-price]');
 
     /* Consistent label mapping — single source of truth */
     var ROLE_LABELS = { kid: 'Cub', girl: 'Girl', man: 'Man', women: 'Woman', woman: 'Woman' };
     var ROLE_CART_LABELS = { kid: 'Boy Cub', girl: 'Girl Cub', man: 'Man', women: 'Woman', woman: 'Woman' };
-    var BIS_KLAVIYO_PUBLIC_KEY = 'abc';
-    var BIS_KLAVIYO_FORM_ID = 'xyz';
-    var lastOosPopupKey = null;
-    var bisModalEl = null;
+    var BIS_KLAVIYO_PUBLIC_KEY = 'SHh2fV';
+    var BIS_KLAVIYO_FORM_ID = 'Te5fz7';
     var allBtns = [];
 
     /* Keep Shopify option order as rendered in Liquid.
@@ -56,23 +55,12 @@ window._familyBundleLoaded = true;
     function syncStickyBarPrice(total) {
       var sp = document.querySelector('.sticky-atc-bar__price [data-price]');
       if (sp) sp.textContent = formatMoney(total);
-      var sp_main = document.querySelector('.product__price-and-ratings [data-price]');
-      if (sp_main) sp_main.textContent = formatMoney(total);
       var sc = document.querySelector('.sticky-atc-bar__price [data-compare-price]');
       if (sc) sc.textContent = '';
     }
 
     function isChipOutOfStock(chip) {
       return !!chip && chip.getAttribute('data-available') !== 'true';
-    }
-
-    function getChipKey(chip) {
-      var group = chip.closest('[data-bundle-chips]');
-      var member = chip.closest('[data-bundle-member]');
-      var role = member ? member.getAttribute('data-bundle-member') : 'member';
-      var option = group ? (group.getAttribute('data-option-name') || group.getAttribute('data-option-position') || 'option') : 'option';
-      var value = chip.getAttribute('data-value') || '';
-      return role + '::' + option + '::' + value;
     }
 
     function ensureMemberStockError(member) {
@@ -152,84 +140,23 @@ window._familyBundleLoaded = true;
       }
     }
 
-    function openKlaviyoBackInStockForm(email, payload) {
-      window._learnq = window._learnq || [];
-      window._learnq.push(['account', BIS_KLAVIYO_PUBLIC_KEY]);
-      window._learnq.push(['identify', {
-        $email: email,
-        email: email,
-        family_bundle_parent: parentTitle,
-        family_bundle_member: payload.member,
-        family_bundle_variant: payload.variant,
-        family_bundle_variant_id: payload.variantId
-      }]);
-      window._learnq.push(['track', 'Family Bundle Back In Stock Requested', {
-        member: payload.member,
-        variant: payload.variant,
-        variant_id: payload.variantId
-      }]);
+    function ensureKlaviyoOnsiteLoaded() {
+      if (!BIS_KLAVIYO_PUBLIC_KEY) return;
 
-      if (window._klOnsite && BIS_KLAVIYO_FORM_ID) {
-        window._klOnsite.push(['openForm', BIS_KLAVIYO_FORM_ID]);
-      }
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['account', BIS_KLAVIYO_PUBLIC_KEY]);
+
+      var existing = document.querySelector('script[data-family-bundle-klaviyo]');
+      if (existing) return;
+
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=' + encodeURIComponent(BIS_KLAVIYO_PUBLIC_KEY);
+      script.setAttribute('data-family-bundle-klaviyo', 'true');
+      document.head.appendChild(script);
     }
 
-    function ensureBisModal() {
-      if (bisModalEl) return bisModalEl;
-
-      var wrap = document.createElement('div');
-      wrap.className = 'family-bundle__bis-modal';
-      wrap.innerHTML =
-        '<div class="family-bundle__bis-backdrop" data-bis-close></div>' +
-        '<div class="family-bundle__bis-panel" role="dialog" aria-modal="true" aria-label="Back in stock">' +
-          '<button type="button" class="family-bundle__bis-close" data-bis-close aria-label="Close">×</button>' +
-          '<h4 class="family-bundle__bis-title">Back in Stock Alert</h4>' +
-          '<p class="family-bundle__bis-copy">Get notified when <strong data-bis-member></strong> size <strong data-bis-variant></strong> is back.</p>' +
-          '<form class="family-bundle__bis-form" data-bis-form>' +
-            '<input type="email" class="family-bundle__bis-email" data-bis-email placeholder="Enter your email" required>' +
-            '<button type="submit" class="family-bundle__bis-submit">Notify Me</button>' +
-          '</form>' +
-          '<p class="family-bundle__bis-feedback" data-bis-feedback></p>' +
-        '</div>';
-
-      wrap.addEventListener('click', function(e) {
-        if (e.target.closest('[data-bis-close]')) {
-          wrap.classList.remove('is-open');
-        }
-      });
-
-      var form = wrap.querySelector('[data-bis-form]');
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        var emailInput = wrap.querySelector('[data-bis-email]');
-        var feedback = wrap.querySelector('[data-bis-feedback]');
-        var email = (emailInput.value || '').trim();
-        if (!email) return;
-
-        var payload = {
-          member: wrap.getAttribute('data-member-label') || '',
-          variant: wrap.getAttribute('data-variant-value') || '',
-          variantId: wrap.getAttribute('data-variant-id') || ''
-        };
-
-        try {
-          openKlaviyoBackInStockForm(email, payload);
-          feedback.textContent = 'Thanks. We will notify you when this variant is back in stock.';
-          feedback.classList.add('is-success');
-          setTimeout(function() { wrap.classList.remove('is-open'); }, 1100);
-        } catch (err) {
-          feedback.textContent = 'Unable to submit right now. Please try again.';
-          feedback.classList.remove('is-success');
-        }
-      });
-
-      bundle.appendChild(wrap);
-      bisModalEl = wrap;
-      return bisModalEl;
-    }
-
-    function openBisModal(chip) {
-      var modal = ensureBisModal();
+    function openKlaviyoBackInStockForm(chip) {
       var member = chip.closest('[data-bundle-member]');
       var memberLabelEl = member ? member.querySelector('.family-bundle__member-label') : null;
       var memberLabel = memberLabelEl ? memberLabelEl.textContent.trim() : 'Selected member';
@@ -237,14 +164,25 @@ window._familyBundleLoaded = true;
       var row = chip.closest('.family-bundle__option-row');
       var variant = member && row ? getSelectedVariantFromRow(member, row) : null;
 
-      modal.setAttribute('data-member-label', memberLabel);
-      modal.setAttribute('data-variant-value', variantValue);
-      modal.setAttribute('data-variant-id', variant ? String(variant.id) : '');
-      modal.querySelector('[data-bis-member]').textContent = memberLabel;
-      modal.querySelector('[data-bis-variant]').textContent = variantValue;
-      modal.querySelector('[data-bis-feedback]').textContent = '';
-      modal.querySelector('[data-bis-feedback]').classList.remove('is-success');
-      modal.classList.add('is-open');
+      if (!BIS_KLAVIYO_PUBLIC_KEY || !BIS_KLAVIYO_FORM_ID) {
+        showError('Notify form is not configured.');
+        return;
+      }
+
+      ensureKlaviyoOnsiteLoaded();
+
+      window._learnq = window._learnq || [];
+      window._learnq.push(['account', BIS_KLAVIYO_PUBLIC_KEY]);
+      window._learnq.push(['track', 'Family Bundle Back In Stock Requested', {
+        family_bundle_parent: parentTitle,
+        member: memberLabel,
+        variant: variantValue,
+        variant_id: variant ? String(variant.id) : ''
+      }]);
+
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['account', BIS_KLAVIYO_PUBLIC_KEY]);
+      window._klOnsite.push(['openForm', BIS_KLAVIYO_FORM_ID]);
     }
 
     function getSelectedVariant(memberEl) {
@@ -297,8 +235,6 @@ window._familyBundleLoaded = true;
           var qty = parseInt((m.querySelector('[data-bundle-qty]') || { value: 1 }).value) || 1;
           if (variant) memberTotal += variant.price * qty;
         } else {
-          /* Track original row price separately from clone prices */
-          var originalRowTotal = 0;
           rows.forEach(function(row) {
             var variant = getSelectedVariantFromRow(m, row);
             var qtyInput = row.querySelector('[data-bundle-qty]');
@@ -310,8 +246,6 @@ window._familyBundleLoaded = true;
             if (cloneSection) {
               var clonePriceEl = cloneSection.querySelector('[data-bundle-clone-price]');
               if (clonePriceEl) clonePriceEl.textContent = formatMoney(rowPrice);
-            } else {
-              originalRowTotal += rowPrice;
             }
             memberTotal += rowPrice;
           });
@@ -325,18 +259,6 @@ window._familyBundleLoaded = true;
       syncStickyBarPrice(total);
     }
 
-    // Auto-select first available size
-    bundle.querySelectorAll('[data-bundle-chips]').forEach(function(group) {
-      var first = group.querySelector('[data-available="true"]');
-      if (first) {
-        first.classList.add('selected');
-        var row = group.previousElementSibling;
-        if (row) {
-          var lbl = row.querySelector('[data-bundle-selected-value]');
-          if (lbl) lbl.textContent = first.getAttribute('data-value');
-        }
-      }
-    });
 
     // Chip & qty events
     bundle.addEventListener('click', function(e) {
@@ -345,8 +267,8 @@ window._familyBundleLoaded = true;
         var group = chip.closest('[data-bundle-chips]');
         var wasSelected = chip.classList.contains('selected');
 
-        /* Allow users to undo accidental OOS selection by clicking the same chip again */
-        if (wasSelected && isChipOutOfStock(chip)) {
+        /* Clicking an already-selected chip deselects it */
+        if (wasSelected) {
           chip.classList.remove('selected');
           chip.classList.remove('oos-selected');
           updateTotal();
@@ -362,11 +284,7 @@ window._familyBundleLoaded = true;
         chip.classList.add('selected');
         if (isChipOutOfStock(chip)) {
           chip.classList.add('oos-selected');
-          var chipKey = getChipKey(chip);
-          if (lastOosPopupKey !== chipKey) {
-            openBisModal(chip);
-            lastOosPopupKey = chipKey;
-          }
+          openKlaviyoBackInStockForm(chip);
         }
         var row = group.previousElementSibling;
         if (row) {
@@ -448,7 +366,9 @@ window._familyBundleLoaded = true;
         '<span class="family-bundle__member-label fs-body-75">ADDITIONAL ' + labelText + '</span>' +
         '</div>' +
         '<span class="family-bundle__member-price fs-body-100" data-bundle-clone-price>£0.00</span>' +
-        '<button type="button" class="family-bundle__row-remove" data-bundle-remove-row>REMOVE</button>';
+        '<div class="family-bundle__member-actions">' +
+        '<button type="button" class="family-bundle__row-remove" data-bundle-remove-row>REMOVE</button>' +
+        '</div>';
       section.appendChild(header);
 
       /* Clone the size chips + qty row */
@@ -601,6 +521,7 @@ window._familyBundleLoaded = true;
             return;
           }
           var props1 = { 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId };
+          if (parentHandle) props1['_bundle_parent_handle'] = parentHandle;
           if (giftNote) props1['Gift Message'] = giftNote;
           items.push({ id: variant.id, quantity: 1, properties: props1 });
         } else {
@@ -626,6 +547,7 @@ window._familyBundleLoaded = true;
             var qty = parseInt((qtyInput || { value: 1 }).value) || 1;
 
             var props2 = { 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId };
+            if (parentHandle) props2['_bundle_parent_handle'] = parentHandle;
             if (giftNote) props2['Gift Message'] = giftNote;
             items.push({ id: variant.id, quantity: qty, properties: props2 });
           }
@@ -703,6 +625,7 @@ window._familyBundleLoaded = true;
     updateTotal();
     updateIncludesText();
     updateAtcAvailability();
+    ensureKlaviyoOnsiteLoaded();
   }
 
   /* ================================================================

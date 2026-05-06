@@ -1205,6 +1205,10 @@
           {
             "label": "t:settings_schema.cart.settings.cross_sells.cross_sells_recommendations_type.options.product_list",
             "value": "product-list"
+          },
+          {
+            "label": "t:settings_schema.cart.settings.cross_sells.cross_sells_recommendations_type.options.metafield",
+            "value": "metafield"
           }
         ],
         "default": "collection"

@@ -95,7 +95,7 @@
       data-show-product-rating="{{ block_settings.show_product_rating }}"
     >
       {%- liquid
-        assign pdp_bundle_price = 0
+        assign pdp_bundle_lowest = nil
         assign pdp_is_bundle = false
         assign pdp_kid = product.metafields.custom.kid_product.value
         assign pdp_man = product.metafields.custom.man_product.value
@@ -103,17 +103,23 @@
         assign pdp_girl = product.metafields.custom.girl_product.value
         if pdp_kid != blank or pdp_man != blank or pdp_woman != blank or pdp_girl != blank
           assign pdp_is_bundle = true
-          if pdp_kid != blank
-            assign pdp_bundle_price = pdp_bundle_price | plus: pdp_kid.price
-          endif
           if pdp_man != blank
-            assign pdp_bundle_price = pdp_bundle_price | plus: pdp_man.price
+            assign pdp_bundle_lowest = pdp_man.price
+          endif
+          if pdp_kid != blank
+            if pdp_bundle_lowest == nil or pdp_kid.price < pdp_bundle_lowest
+              assign pdp_bundle_lowest = pdp_kid.price
+            endif
           endif
           if pdp_woman != blank
-            assign pdp_bundle_price = pdp_bundle_price | plus: pdp_woman.price
+            if pdp_bundle_lowest == nil or pdp_woman.price < pdp_bundle_lowest
+              assign pdp_bundle_lowest = pdp_woman.price
+            endif
           endif
           if pdp_girl != blank
-            assign pdp_bundle_price = pdp_bundle_price | plus: pdp_girl.price
+            if pdp_bundle_lowest == nil or pdp_girl.price < pdp_bundle_lowest
+              assign pdp_bundle_lowest = pdp_girl.price
+            endif
           endif
         endif
       -%}
@@ -126,8 +132,8 @@
             {%- endif -%}
           </s>
           <span data-price>
-            {%- if pdp_is_bundle and product.price == 0 -%}
-              {{- pdp_bundle_price | money -}}
+            {%- if pdp_is_bundle -%}
+              from <strong class="mc-bundle-price-amount">{{ pdp_bundle_lowest | money }}</strong>
             {%- elsif price_content_type == 'price' %}
               {{ current_variant.price | money -}}
             {%- elsif price_content_type == 'custom' -%}
@@ -136,66 +142,7 @@
           </span>
 
           {%- if pdp_is_bundle -%}
-            {%- liquid
-              assign member_names_arr = ''
-              if pdp_man != blank
-                assign member_names_arr = member_names_arr | append: 'Man,'
-              endif
-              if pdp_kid != blank
-                assign member_names_arr = member_names_arr | append: 'Cub,'
-              endif
-              if pdp_woman != blank
-                assign member_names_arr = member_names_arr | append: 'Woman,'
-              endif
-              if pdp_girl != blank
-                assign member_names_arr = member_names_arr | append: 'Girl,'
-              endif
-              assign member_names_arr = member_names_arr | remove_last: ',' | split: ','
-              assign includes_single_tpl = block_settings.includes_single | default: 'Includes {members} Only'
-              assign includes_duo_tpl = block_settings.includes_duo | default: 'Includes both {members}'
-              assign includes_family_tpl = block_settings.includes_family | default: 'Includes for the whole Family'
-            -%}
-            <span
-              class="mc-bundle-includes"
-              data-bundle-includes
-              data-tpl-single="{{ includes_single_tpl | escape }}"
-              data-tpl-duo="{{ includes_duo_tpl | escape }}"
-              data-tpl-family="{{ includes_family_tpl | escape }}"
-            >
-              {%- assign placeholder_token = '{members}' -%}
-              {%- if member_names_arr.size >= 3 -%}
-                {{ includes_family_tpl }}
-              {%- elsif member_names_arr.size == 2 -%}
-                {%- assign duo_names = member_names_arr | first | append: ' & ' | append: member_names_arr.last -%}
-                {%- assign duo_output = includes_duo_tpl | replace: placeholder_token, duo_names -%}
-                {{ duo_output }}
-              {%- elsif member_names_arr.size == 1 -%}
-                {%- assign single_output = includes_single_tpl | replace: placeholder_token, member_names_arr.first -%}
-                {{ single_output }}
-              {%- endif -%}
-            </span>
-            <style>
-              .product__price {
-                display: flex;
-                align-items: baseline;
-                flex-wrap: wrap;
-                gap: 0 8px;
-              }
-              .product__price [data-price] {
-                font-size: 1.15em;
-                font-weight: 700;
-                color: #1a1a1a;
-              }
-              .mc-bundle-includes {
-                font-family: var(--font-body);
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                color: #7c8a97;
-                line-height: 1;
-              }
-            </style>
+            <style>.mc-bundle-price-amount { font-weight: 700; }</style>
           {%- endif -%}
 
           {%- if block_settings.show_discount -%}

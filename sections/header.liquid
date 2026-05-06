@@ -106,6 +106,11 @@
     endif
   endcapture
 -%}
+{% style %}
+  .header__row .disclosure-form{
+    margin-top:0;
+  }
+{% endstyle %}
 
 {%- capture logo_sizes -%}(max-width: 960px) {{ mobile_logo_width }}px, {{ logo_width }}px{%- endcapture -%}
 
@@ -193,6 +198,7 @@
     data-at-end="{% if section.settings.layout == 'logo-center_nav-below' or section.settings.layout == 'logo-left_nav-below' %}true{% else %}false{% endif %}"
     data-axis="horizontal"
   >
+    {{ header_logo }}
     <button
       class="scroll-button"
       data-position="start"
@@ -368,7 +374,6 @@
           {{ secondary_nav }}
         {%- endif -%}
         {{ social_icons }}
-        {{ localization_dropdowns }}
       </div>
     </div>
 
@@ -389,7 +394,7 @@
         {{ header_logo }}
         {{ primary_nav }}
       {%- elsif logo_position == 'left' and navigation_position == 'center' -%}
-        {{ header_logo }}
+        {% comment %} {{ header_logo }} {% endcomment %}
       {%- endif -%}
     {%- endcapture -%}
 
@@ -410,6 +415,8 @@
       {%- endif -%}
 
       <div class="header__row-segment header__row-segment-desktop right">
+          {{ localization_dropdowns }}
+
         {%- unless logo_position == 'center' and navigation_position == 'below' -%}
           {{ search_icon }}
         {%- endunless -%}
@@ -530,8 +537,8 @@
     .drawer-menu__panel { width: 100vw !important; left: 0 !important; overflow-x: hidden !important; }
     .drawer-menu__bottom,
     .drawer-menu__all-links,
-    .drawer-menu__contents { overflow-x: hidden !important; }
-    .mc-drawer-navbar-item { display: list-item !important; }
+    {% comment %} .drawer-menu__contents { overflow-x: hidden !important; } {% endcomment %}
+    {% comment %} .mc-drawer-navbar-item { display: list-item !important; } {% endcomment %}
   }
 </style>
 
@@ -660,7 +667,7 @@
       "type": "range",
       "id": "logo_width",
       "label": "t:sections.shared.header.settings.logo.logo_width.label",
-      "min": 50,
+      "min": 10,
       "max": 350,
       "step": 10,
       "unit": "px",
@@ -670,7 +677,7 @@
       "type": "range",
       "id": "mobile_logo_width",
       "label": "t:sections.shared.header.settings.logo.mobile_logo_width.label",
-      "min": 50,
+      "min": 10,
       "max": 250,
       "step": 10,
       "unit": "px",
