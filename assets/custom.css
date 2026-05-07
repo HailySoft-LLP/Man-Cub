@@ -202,16 +202,20 @@ html:not(.no-js) .navigation__submenu[data-depth="2"] .navigation__submenu-item 
 .product__title {
   text-transform: uppercase;
 }
-@media (max-width: 767px) {
-.footer .image.footer__image {
-  margin:0 auto;
-}
-.footer__group--collapse .footer__header {
-  justify-content: center;
-  gap: 10px;
+/* Footer logo - remove top space so it aligns to top */
+.footer__image {
+  margin-top: 0 !important;
 }
 
-.footer__links ul{
-  text-align: center;
-}
+@media (max-width: 767px) {
+  .footer .image.footer__image {
+    margin: 0 auto;
+  }
+  .footer__group--collapse .footer__header {
+    justify-content: center;
+    gap: 10px;
+  }
+  .footer__links ul {
+    text-align: center;
+  }
 }
