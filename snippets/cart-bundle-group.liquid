@@ -31,46 +31,89 @@
     </div>
   </div>
 
+  {%- assign bundle_items_man = '' -%}
+  {%- assign bundle_items_cub = '' -%}
+  {%- assign bundle_items_woman = '' -%}
+  {%- assign bundle_items_girl_cub = '' -%}
+  {%- assign bundle_items_other = '' -%}
+
   {%- for bi in cart.items -%}
     {%- if bi.properties['_bundle_id'] == item_bundle_id -%}
-      {%- assign bi_role = bi.properties['For'] | downcase -%}
+      {%- assign bi_role_raw = bi.properties['For'] | default: '' | strip | downcase -%}
+      {%- assign bi_normalized_role = '' -%}
+      {%- assign bi_display_role = bi.properties['For'] -%}
+
+      {%- if bi_role_raw contains 'girl' -%}
+        {%- assign bi_normalized_role = 'girl cub' -%}
+        {%- assign bi_display_role = 'GIRL CUB' -%}
+      {%- elsif bi_role_raw contains 'women' or bi_role_raw contains 'woman' -%}
+        {%- assign bi_normalized_role = 'woman' -%}
+      {%- elsif bi_role_raw == 'cub' or bi_role_raw contains 'boy cub' or bi_role_raw contains 'kid' -%}
+        {%- assign bi_normalized_role = 'cub' -%}
+        {%- assign bi_display_role = 'CUB' -%}
+      {%- elsif bi_role_raw contains 'man' -%}
+        {%- assign bi_normalized_role = 'man' -%}
+      {%- endif -%}
+
       {%- assign bundle_parent_handle = bi.properties['_bundle_parent_handle'] -%}
       {%- assign bundle_parent_product = blank -%}
       {%- if bundle_parent_handle != blank and all_products[bundle_parent_handle] != blank -%}
         {%- assign bundle_parent_product = all_products[bundle_parent_handle] -%}
       {%- endif -%}
-      <div class="{{ prefix }}__bundle-sub-item" data-input-item data-id="{{ bi.id }}" data-key="{{ bi.key }}">
-        <div class="{{ prefix }}__bundle-sub-image">
-          {%- if bundle_parent_product != blank and bundle_parent_product.featured_image != blank -%}
-            <img src="{{ bundle_parent_product.featured_image | image_url: width: 120 }}" alt="{{ bundle_parent_product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          {%- elsif bi.image != blank -%}
-            <img src="{{ bi.image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          {%- elsif bi.variant.image != blank -%}
-            <img src="{{ bi.variant.image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          {%- elsif bi.product.featured_image != blank -%}
-            <img src="{{ bi.product.featured_image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          {%- elsif bi.product.images.first != blank -%}
-            <img src="{{ bi.product.images.first | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          {%- else -%}
-            {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
-          {%- endif -%}
-        </div>
-        <div class="{{ prefix }}__bundle-sub-details">
-          <div class="{{ prefix }}__bundle-sub-info">
-            <span class="{{ prefix }}__bundle-sub-role">{{ bi.properties['For'] }}</span>
-            {%- unless bi.product.has_only_default_variant -%}
-              <span class="{{ prefix }}__bundle-sub-variant">{{ bi.variant.title }}</span>
-            {%- endunless -%}
+
+      {%- capture bundle_sub_item_markup -%}
+        <div class="{{ prefix }}__bundle-sub-item" data-input-item data-id="{{ bi.id }}" data-key="{{ bi.key }}">
+          <div class="{{ prefix }}__bundle-sub-image">
+            {%- if bundle_parent_product != blank and bundle_parent_product.featured_image != blank -%}
+              <img src="{{ bundle_parent_product.featured_image | image_url: width: 120 }}" alt="{{ bundle_parent_product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            {%- elsif bi.image != blank -%}
+              <img src="{{ bi.image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            {%- elsif bi.variant.image != blank -%}
+              <img src="{{ bi.variant.image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            {%- elsif bi.product.featured_image != blank -%}
+              <img src="{{ bi.product.featured_image | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            {%- elsif bi.product.images.first != blank -%}
+              <img src="{{ bi.product.images.first | image_url: width: 120 }}" alt="{{ bi.product.title | escape }}" width="60" height="60" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+            {%- endif -%}
           </div>
-          <div class="{{ prefix }}__bundle-sub-right">
-            <div class="{{ prefix }}__bundle-sub-qty">
-              {% render 'quantity-input', id: bi.id, initial_value: bi.quantity %}
+          <div class="{{ prefix }}__bundle-sub-details">
+            <div class="{{ prefix }}__bundle-sub-info">
+              <span class="{{ prefix }}__bundle-sub-role">{{ bi_display_role }}</span>
+              {%- unless bi.product.has_only_default_variant -%}
+                <span class="{{ prefix }}__bundle-sub-variant">{{ bi.variant.title }}</span>
+              {%- endunless -%}
+            </div>
+            <div class="{{ prefix }}__bundle-sub-right">
+              <div class="{{ prefix }}__bundle-sub-qty">
+                {% render 'quantity-input', id: bi.id, initial_value: bi.quantity %}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      {%- endcapture -%}
+
+      {%- case bi_normalized_role -%}
+        {%- when 'man' -%}
+          {%- assign bundle_items_man = bundle_items_man | append: bundle_sub_item_markup -%}
+        {%- when 'cub' -%}
+          {%- assign bundle_items_cub = bundle_items_cub | append: bundle_sub_item_markup -%}
+        {%- when 'woman' -%}
+          {%- assign bundle_items_woman = bundle_items_woman | append: bundle_sub_item_markup -%}
+        {%- when 'girl cub' -%}
+          {%- assign bundle_items_girl_cub = bundle_items_girl_cub | append: bundle_sub_item_markup -%}
+        {%- else -%}
+          {%- assign bundle_items_other = bundle_items_other | append: bundle_sub_item_markup -%}
+      {%- endcase -%}
     {%- endif -%}
   {%- endfor -%}
+
+  {{ bundle_items_man }}
+  {{ bundle_items_cub }}
+  {{ bundle_items_woman }}
+  {{ bundle_items_girl_cub }}
+  {{ bundle_items_other }}
 
   <div class="{{ prefix }}__bundle-footer">
     {%- if bundle_gift_note != blank -%}

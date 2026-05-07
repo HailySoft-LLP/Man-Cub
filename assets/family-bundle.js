@@ -33,7 +33,7 @@ window._familyBundleLoaded = true;
 
     /* Consistent label mapping — single source of truth */
     var ROLE_LABELS = { kid: 'Cub', girl: 'Girl', man: 'Man', women: 'Woman', woman: 'Woman' };
-    var ROLE_CART_LABELS = { kid: 'Boy Cub', girl: 'Girl Cub', man: 'Man', women: 'Woman', woman: 'Woman' };
+    var ROLE_CART_LABELS = { kid: 'CUB', girl: 'GIRL CUB', man: 'Man', women: 'Woman', woman: 'Woman' };
     var BIS_KLAVIYO_PUBLIC_KEY = 'SHh2fV';
     var BIS_KLAVIYO_FORM_ID = 'Te5fz7';
     var allBtns = [];
