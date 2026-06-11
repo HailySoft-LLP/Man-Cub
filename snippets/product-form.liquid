@@ -7,11 +7,41 @@
 {%- endcomment -%}
 
 {%- liquid
+  assign has_preorder_variant = false
+  assign current_variant_is_preorder = false
+  assign product_preorder_enabled = false
+  assign preorder_button_text = block.settings.preorder_button_text | default: 'Pre-order'
+  assign preorder_property_label = block.settings.preorder_property_label | default: 'Pre-order'
+  assign preorder_property_value = block.settings.preorder_property_value | default: 'Yes'
   assign product_available_label = 'products.product.add_to_cart' | t
   assign product_unavailable_label = 'products.product.sold_out' | t
 
-  if template.suffix == 'preorder'
-    assign product_available_label = 'products.product.preorder' | t
+  assign product_preorder_enabled_value = prod.metafields.custom.preorder_enabled.value
+  assign product_preorder_enabled_string = product_preorder_enabled_value | append: '' | downcase
+  if product_preorder_enabled_value == true or product_preorder_enabled_string == 'true' or product_preorder_enabled_string == 'yes'
+    assign product_preorder_enabled = true
+    assign has_preorder_variant = true
+  endif
+
+  for variant in prod.variants
+    assign preorder_enabled_value = variant.metafields.custom.preorder_enabled.value
+    assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase
+    if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes'
+      assign has_preorder_variant = true
+
+      if current_variant and variant.id == current_variant.id
+        assign current_variant_is_preorder = true
+      endif
+    endif
+  endfor
+
+  assign initial_preorder_enabled = current_variant_is_preorder
+  if initial_preorder_enabled == false and product_preorder_enabled
+    assign initial_preorder_enabled = true
+  endif
+
+  if initial_preorder_enabled
+    assign product_available_label = preorder_button_text
   endif
 -%}
 
@@ -48,6 +78,32 @@
       aria-label="{{ 'general.accessibility.quantity' | t }}"
     >
   </div>
+
+  <input
+    type="hidden"
+    name="properties[{{ preorder_property_label | escape }}]"
+    value="{{ preorder_property_value | escape }}"
+    data-preorder-property
+    {% unless initial_preorder_enabled %}disabled{% endunless %}
+  >
+  <input
+    type="hidden"
+    name="properties[_preorder]"
+    value="true"
+    data-preorder-property
+    {% unless initial_preorder_enabled %}disabled{% endunless %}
+  >
+
+  <script
+    type="application/json"
+    data-preorder-limits-json
+  >
+    {
+      "has_preorder_variant": {{ has_preorder_variant | json }},
+      "product_preorder_enabled": {{ product_preorder_enabled | json }},
+      "variants": {% render 'preorder-variant-data-json', product: prod %}
+    }
+  </script>
 
   {% comment -%}
      option field within form remains hidden but will be updated
@@ -159,7 +215,10 @@
         aria-label="{% unless current_variant.available %}{{ product_unavailable_label }}{% else %}{{ product_available_label }}{% endunless %}"
         class="product-form__cart-submit btn btn--medium btn--full {% if show_dynamic_checkout %}btn--secondary{% else %}btn--primary{% endif %}"
         data-add-to-cart
-        data-lang-available="{{ product_available_label }}"
+        data-product-preorder="{{ initial_preorder_enabled }}"
+        data-normal-text="{{ 'products.product.add_to_cart' | t | escape }}"
+        data-preorder-text="{{ preorder_button_text | escape }}"
+        data-lang-available="{{ product_available_label | escape }}"
         data-lang-unavailable="{{ 'product.unavailable' | t }}"
         data-lang-sold-out="{{ 'product.sold_out' | t }}"
       >

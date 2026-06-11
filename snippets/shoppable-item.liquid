@@ -40,20 +40,21 @@
   {%- unless product_item == blank or show_hotspot_cards == false -%}
     {%- liquid
       assign si_price = product_item.price
+      assign si_bundle_price = blank
       if product_item.price == 0
         assign si_kid = product_item.metafields.custom.kid_product.value
         assign si_man = product_item.metafields.custom.man_product.value
-        assign si_woman = product_item.metafields.custom.women_product.value
-        if si_kid != blank or si_man != blank or si_woman != blank
-          assign si_price = 0
+        if si_kid != blank or si_man != blank
           if si_kid != blank
-            assign si_price = si_price | plus: si_kid.price
+            assign si_bundle_price = si_kid.price
           endif
           if si_man != blank
-            assign si_price = si_price | plus: si_man.price
+            if si_bundle_price == blank or si_man.price < si_bundle_price
+              assign si_bundle_price = si_man.price
+            endif
           endif
-          if si_woman != blank
-            assign si_price = si_price | plus: si_woman.price
+          if si_bundle_price != blank
+            assign si_price = si_bundle_price
           endif
         endif
       endif
@@ -86,7 +87,7 @@
         <div class="mc-shoppable-card__right">
           <a href="{{ product_item.url }}" class="mc-shoppable-card__title">{{ product_item.title }}</a>
           <div class="mc-shoppable-card__bottom-row">
-            <span class="mc-shoppable-card__price">{{ si_price | money }}</span>
+            <span class="mc-shoppable-card__price">{% if si_bundle_price != blank %}From {% endif %}{{ si_price | money }}</span>
             <a href="{{ product_item.url }}" class="mc-shoppable-card__atc" style="background:none;border:none;padding:0;margin-right:6px;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;">View</a>
           </div>
         </div>

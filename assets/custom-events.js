@@ -66,3 +66,4 @@ document.addEventListener("product:quantity-update", function (evt) {
 document.addEventListener("quickview:loaded", function () {
   console.log("Quickview loaded");
 });
+

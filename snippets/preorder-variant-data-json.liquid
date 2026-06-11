@@ -1,0 +1,56 @@
+{%- comment -%}
+  Renders variant data with preorder metafields.
+
+  Pass in:
+  - product: product object
+{%- endcomment -%}
+[
+  {%- for variant in product.variants -%}
+    {%- liquid
+      assign preorder_enabled_value = variant.metafields.custom.preorder_enabled.value
+      assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase
+      assign preorder_enabled = false
+      if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes'
+        assign preorder_enabled = true
+      endif
+
+      assign preorder_limit = variant.metafields.custom.preorder_limit.value | default: 0 | plus: 0
+      assign preorder_sold = variant.metafields.custom.preorder_sold.value | default: 0 | plus: 0
+      assign preorder_remaining = preorder_limit | minus: preorder_sold
+
+      if preorder_remaining < 0
+        assign preorder_remaining = 0
+      endif
+
+      assign preorder_managed = false
+      if preorder_enabled and preorder_limit > 0
+        assign preorder_managed = true
+      endif
+
+      assign inventory_available = false
+      if variant.available
+        if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue'
+          assign inventory_available = true
+        endif
+      endif
+
+      assign real_available = inventory_available
+      if preorder_managed and preorder_remaining <= 0
+        assign real_available = false
+      endif
+    -%}
+    {
+      "id": {{ variant.id | json }},
+      "title": {{ variant.title | json }},
+      "price": {{ variant.price | json }},
+      "compare_at_price": {{ variant.compare_at_price | json }},
+      "available": {{ real_available | json }},
+      "preorder_enabled": {{ preorder_enabled | json }},
+      "preorder_remaining": {{ preorder_remaining | json }},
+      "preorder_managed": {{ preorder_managed | json }},
+      "option1": {{ variant.option1 | json }},
+      "option2": {{ variant.option2 | json }},
+      "option3": {{ variant.option3 | json }}
+    }{% unless forloop.last %},{% endunless %}
+  {%- endfor -%}
+]

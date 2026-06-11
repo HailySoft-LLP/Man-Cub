@@ -46,10 +46,7 @@
         },
         "family_bundle": {
           "type": "family_bundle",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
+          "settings": {}
         },
         "inventory-counter": {
           "type": "inventory-counter",

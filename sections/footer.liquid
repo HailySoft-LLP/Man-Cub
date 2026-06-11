@@ -156,15 +156,25 @@
 
                 {% assign custom_button_label = 'general.newsletter_form.submit' | t %}
 
-                {% render 'newsletter-form',
-                  form_id: 'footer-subscribe',
-                  base_class: 'footer__newsletter',
-                  enable_collect_customer_name: block.settings.enable_collect_customer_name,
-                  custom_button: true,
-                  custom_button_id: 'Subscribe-footer',
-                  custom_button_class: 'footer__newsletter-button',
-                  custom_button_label: custom_button_label
-                %}
+                {% if block.settings.klaviyo_form_id %}
+                  <div class="klaviyo-form-{{block.settings.klaviyo_form_id}}"></div>
+                  <style>
+                    [data-testid="klaviyo-form-{{block.settings.klaviyo_form_id}}"]{
+                      border: 0 !important;
+                      border-bottom: 1px solid #ffffff !important;
+                    }
+                  </style>
+                {% else %}
+                  {% render 'newsletter-form',
+                    form_id: 'footer-subscribe',
+                    base_class: 'footer__newsletter',
+                    enable_collect_customer_name: block.settings.enable_collect_customer_name,
+                    custom_button: true,
+                    custom_button_id: 'Subscribe-footer',
+                    custom_button_class: 'footer__newsletter-button',
+                    custom_button_label: custom_button_label
+                  %}
+                {% endif %}
 
                 {%- if block.settings.show_social_icons -%}
                   {% render 'social-icons' %}
@@ -561,6 +571,16 @@
           "id": "text",
           "label": "t:sections.footer.blocks.newsletter.settings.text.label",
           "default": "t:sections.footer.blocks.newsletter.settings.text.default"
+        },
+        {
+          "type": "header",
+          "content": "Klaviyo Integration",
+          "info": "If Form ID is blank, Shopify default Newsletter will be applicable"
+        },
+        {
+          "type": "text",
+          "id": "klaviyo_form_id",
+          "label": "Klaviyo Form ID"
         },
         {
           "type": "header",

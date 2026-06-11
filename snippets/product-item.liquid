@@ -263,12 +263,14 @@
         {% liquid
           assign price_content_type = 'price'
           assign bundle_total_price = 0
+          assign bundle_total_compare_price = 0
+          assign bundle_compare_price_available = false
           assign is_bundle_product = false
 
           comment
             Check if this is a Family Bundle parent product (price £0.00 with child metafields)
           endcomment
-          if prod.price == 0
+          if prod.metafields.custom.kid_product.value or prod.metafields.custom.man_product.value or prod.metafields.custom.women_product.value
             assign kid_ref = prod.metafields.custom.kid_product.value
             assign man_ref = prod.metafields.custom.man_product.value
             assign woman_ref = prod.metafields.custom.women_product.value
@@ -276,13 +278,68 @@
               assign is_bundle_product = true
               if kid_ref != blank
                 assign bundle_total_price = bundle_total_price | plus: kid_ref.price
+                if kid_ref.compare_at_price > kid_ref.price
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: kid_ref.compare_at_price
+                  assign bundle_compare_price_available = true
+                else
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: kid_ref.price
+                endif
               endif
               if man_ref != blank
                 assign bundle_total_price = bundle_total_price | plus: man_ref.price
+                if man_ref.compare_at_price > man_ref.price
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: man_ref.compare_at_price
+                  assign bundle_compare_price_available = true
+                else
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: man_ref.price
+                endif
               endif
               if woman_ref != blank
                 assign bundle_total_price = bundle_total_price | plus: woman_ref.price
+                if woman_ref.compare_at_price > woman_ref.price
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: woman_ref.compare_at_price
+                  assign bundle_compare_price_available = true
+                else
+                  assign bundle_total_compare_price = bundle_total_compare_price | plus: woman_ref.price
+                endif
               endif
+
+              # GET LOWEST PRICE
+              assign lowest_bundle_price = blank
+              if kid_ref != blank
+                assign lowest_bundle_price = kid_ref.price
+              endif
+
+              if man_ref != blank
+                if lowest_bundle_price == blank or man_ref.price < lowest_bundle_price
+                  assign lowest_bundle_price = man_ref.price
+                endif
+              endif
+
+              if woman_ref != blank
+                if lowest_bundle_price == blank or woman_ref.price < lowest_bundle_price
+                  assign lowest_bundle_price = woman_ref.price
+                endif
+              endif
+
+              # GET LOWEST COMPARE PRICE
+              assign lowest_compare_price = blank
+              if kid_ref != blank and kid_ref.compare_at_price > 0
+                assign lowest_compare_price = kid_ref.compare_at_price
+              endif
+
+              if man_ref != blank and man_ref.compare_at_price > 0
+                if lowest_compare_price == blank or man_ref.compare_at_price < lowest_compare_price
+                  assign lowest_compare_price = man_ref.compare_at_price
+                endif
+              endif
+
+              if woman_ref != blank and woman_ref.compare_at_price > 0
+                if lowest_compare_price == blank or woman_ref.compare_at_price < lowest_compare_price
+                  assign lowest_compare_price = woman_ref.compare_at_price
+                endif
+              endif
+
             endif
           endif
 
@@ -308,8 +365,19 @@
         %}
         {% if price_content_type == 'price' %}
           <p class="product-item__price">
+            {% render 'lipscore-rating-small', product: prod %}
+
             {% if placeholder %}
               {{ 9999 | money }}
+
+            {% elsif is_bundle_product %}
+              {% if bundle_compare_price_available and bundle_total_compare_price > bundle_total_price %}
+                <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+                <s class="t-subdued">{{ lowest_compare_price | money }}</s>
+                <span class="sale">From {{ lowest_bundle_price | money }}</span>
+              {% else %}
+                <span class="product-item__price">From {{ lowest_bundle_price | money }}</span>
+              {% endif %}
 
             {% elsif prod.compare_at_price > prod.price %}
               <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
@@ -340,9 +408,7 @@
               {% endif %}
 
             {% else %}
-              {% if is_bundle_product %}
-                <span class="product-item__price">{{ bundle_total_price | money }}</span>
-              {% elsif prod.price_varies %}
+              {% if prod.price_varies %}
                 {%- assign price = prod.price | money -%}
 
                 {{ 'products.product.from_lowest_price_html' | t: lowest_price: price }}
@@ -366,6 +432,7 @@
             {%- assign custom_price_content = 'products.inventory.zero_price_custom_label' | t -%}
 
             <p class="product-item__price">
+              {% render 'lipscore-rating-small', product: prod %}
               {% liquid
                 capture from_lowest_price_html
                   echo 'products.product.from_lowest_price_html' | t: lowest_price: custom_price_content

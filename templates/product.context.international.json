@@ -1,0 +1,27 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "context": {
+    "market": "international"
+  },
+  "parent": "product.json",
+  "sections": {
+    "main": {
+      "settings": {},
+      "blocks": {
+        "accordion_WkKmhA": {
+          "settings": {
+            "content": "<p><strong>Standard shipping</strong><br/></p><p>International delivery rates are calculated at checkout based on your location and selected delivery method.<br/></p><p><strong>Returns</strong></p><p>Need to return your order? Please use the link below to start your return process.<a href=\"/pages/returns\" target=\"_blank\" title=\"Returns\">here</a></p>"
+          }
+        }
+      }
+    }
+  }
+}

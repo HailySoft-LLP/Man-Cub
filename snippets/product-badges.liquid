@@ -16,15 +16,113 @@
 {%- assign badge_tags = badge_tags_1 | concat: badge_tags_2 | concat: badge_tags_3 | concat: badge_tags_4 -%}
 
 {%- assign custom_badges_translations = shop.metaobjects.custom_badges.custom_badges_translations -%}
+{%- assign sale_badge_enabled = show_sale_badge -%}
+{%- assign product_has_sale_badge = false -%}
+{%- assign product_sale_badge_text = '' -%}
+{%- assign has_preorder_variant = false -%}
+{%- assign product_preorder_enabled_value = prod.metafields.custom.preorder_enabled.value -%}
+{%- assign product_preorder_enabled_string = product_preorder_enabled_value | append: '' | downcase -%}
+
+{%- if product_preorder_enabled_value == true or product_preorder_enabled_string == 'true' or product_preorder_enabled_string == 'yes' -%}
+  {%- assign has_preorder_variant = true -%}
+{%- else -%}
+  {%- for variant in prod.variants -%}
+    {%- assign preorder_enabled_value = variant.metafields.custom.preorder_enabled.value -%}
+    {%- assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase -%}
+    {%- if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes' -%}
+      {%- assign has_preorder_variant = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- if show_sale_badge == nil -%}
+  {%- assign sale_badge_enabled = true -%}
+{%- endif -%}
+
+{%- if prod.compare_at_price > prod.price -%}
+  {%- assign product_has_sale_badge = true -%}
+{%- else -%}
+  {%- for variant in prod.variants -%}
+    {%- if variant.compare_at_price > variant.price -%}
+      {%- assign product_has_sale_badge = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- if product_has_sale_badge == false and prod.price == 0 -%}
+  {%- liquid
+    assign bundle_total_price = 0
+    assign bundle_total_compare_price = 0
+    assign bundle_compare_price_available = false
+    assign kid_ref = prod.metafields.custom.kid_product.value
+    assign man_ref = prod.metafields.custom.man_product.value
+    assign woman_ref = prod.metafields.custom.women_product.value
+
+    if kid_ref != blank
+      assign bundle_total_price = bundle_total_price | plus: kid_ref.price
+      if kid_ref.compare_at_price > kid_ref.price
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: kid_ref.compare_at_price
+        assign bundle_compare_price_available = true
+      else
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: kid_ref.price
+      endif
+    endif
+
+    if man_ref != blank
+      assign bundle_total_price = bundle_total_price | plus: man_ref.price
+      if man_ref.compare_at_price > man_ref.price
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: man_ref.compare_at_price
+        assign bundle_compare_price_available = true
+      else
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: man_ref.price
+      endif
+    endif
+
+    if woman_ref != blank
+      assign bundle_total_price = bundle_total_price | plus: woman_ref.price
+      if woman_ref.compare_at_price > woman_ref.price
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: woman_ref.compare_at_price
+        assign bundle_compare_price_available = true
+      else
+        assign bundle_total_compare_price = bundle_total_compare_price | plus: woman_ref.price
+      endif
+    endif
+
+    if bundle_compare_price_available and bundle_total_compare_price > bundle_total_price
+      assign product_has_sale_badge = true
+    endif
+  -%}
+{%- endif -%}
+
+{%- if product_has_sale_badge -%}
+  {%- capture product_sale_badge_text -%}
+    {%- render 'get-display-discount', prod: prod, format: settings.sale_badge_format -%}
+  {%- endcapture -%}
+  {%- assign product_sale_badge_text = product_sale_badge_text | strip -%}
+
+  {%- if product_sale_badge_text == blank -%}
+    {%- assign product_sale_badge_text = 'products.product.on_sale' | t -%}
+  {%- endif -%}
+{%- endif -%}
 
 {%- unless show_sold_out_badge and prod.available != true %}
-  {%- if show_sale_badge and prod.compare_at_price > prod.price -%}
+  {%- if has_preorder_variant and 1 == 2 -%}
+    {%- capture badges -%}
+      {{ badges }}
+      <div class="product-badge product-badge--preorder">
+        NEW IN
+      </div>
+    {%- endcapture -%}
+  {%- endif -%}
+
+  {%- if sale_badge_enabled and product_has_sale_badge -%}
     {%- capture badges -%}
       {{ badges }}
       <div class="product-badge product-badge--sale">
-        {%- render "get-display-discount", prod: prod, format: settings.sale_badge_format -%}
+        {{ product_sale_badge_text }}
       </div>
-      {{ badges }}
     {%- endcapture -%}
   {%- endif -%}
 

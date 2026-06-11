@@ -29,6 +29,8 @@ window._familyBundleLoaded = true;
 
     var parentTitle = bundle.getAttribute('data-parent-title') || 'Family Bundle';
     var parentHandle = bundle.getAttribute('data-parent-handle') || '';
+    var parentDefaultPreorder = bundle.getAttribute('data-parent-preorder-enabled') === 'true';
+    var bundleChoiceTouched = false;
     var totalPriceEl = bundle.querySelector('[data-bundle-total-price]');
 
     /* Consistent label mapping — single source of truth */
@@ -229,18 +231,22 @@ window._familyBundleLoaded = true;
         var toggle = m.querySelector('[data-bundle-toggle]');
         if (toggle && !toggle.checked) return;
         var memberTotal = 0;
+        var memberSaleTotal = 0;
         var rows = m.querySelectorAll('.family-bundle__option-row');
         if (rows.length === 0) {
           var variant = getSelectedVariant(m);
           var qty = parseInt((m.querySelector('[data-bundle-qty]') || { value: 1 }).value) || 1;
           if (variant) memberTotal += variant.price * qty;
+          memberSaleTotal = variant.compare_at_price;
         } else {
           rows.forEach(function(row) {
             var variant = getSelectedVariantFromRow(m, row);
+            console.log("variant::", variant);
             var qtyInput = row.querySelector('[data-bundle-qty]');
             var qty = parseInt((qtyInput || { value: 1 }).value) || 1;
             var rowPrice = variant ? variant.price * qty : 0;
-
+            memberSaleTotal = variant ? variant.compare_at_price : 0;
+            
             /* Check if this row is inside a clone section */
             var cloneSection = row.closest('.family-bundle__additional-section');
             if (cloneSection) {
@@ -254,6 +260,11 @@ window._familyBundleLoaded = true;
         /* Update the original member header price (not clone prices) */
         var headerPrice = m.querySelector(':scope > .family-bundle__member-header [data-bundle-member-price]');
         if (headerPrice) headerPrice.textContent = formatMoney(memberTotal);
+        
+        m.querySelectorAll('.family-bundle__member-header [data-bundle-member-sale-price]').forEach(function(el){
+          if (el) el.textContent = formatMoney(memberSaleTotal);
+        })
+
       });
       if (totalPriceEl) totalPriceEl.textContent = formatMoney(total);
       syncStickyBarPrice(total);
@@ -262,6 +273,15 @@ window._familyBundleLoaded = true;
 
     // Chip & qty events
     bundle.addEventListener('click', function(e) {
+      console.log("CLICK AFTER ADDED ADDITIONAL");
+      if (
+        e.target.closest('[data-bundle-chip]') ||
+        e.target.closest('[data-bundle-add-another]') ||
+        e.target.closest('[data-bundle-remove-row]')
+      ) {
+        bundleChoiceTouched = true;
+      }
+
       var chip = e.target.closest('[data-bundle-chip]');
       if (chip) {
         var group = chip.closest('[data-bundle-chips]');
@@ -339,7 +359,7 @@ window._familyBundleLoaded = true;
       }
     });
 
-    /* ── ADD ANOTHER SIZE ROW (full section with header) ── */
+    /* ── ADD ADDITIONAL SIZE ROW (full section with header) ── */
     bundle.addEventListener('click', function(e) {
       var addBtn = e.target.closest('[data-bundle-add-another]');
       if (!addBtn) return;
@@ -365,6 +385,7 @@ window._familyBundleLoaded = true;
       header.innerHTML = '<div class="family-bundle__member-info">' +
         '<span class="family-bundle__member-label fs-body-75">ADDITIONAL ' + labelText + '</span>' +
         '</div>' +
+        '<span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price></span>' +
         '<span class="family-bundle__member-price fs-body-100" data-bundle-clone-price>£0.00</span>' +
         '<div class="family-bundle__member-actions">' +
         '<button type="button" class="family-bundle__row-remove" data-bundle-remove-row>REMOVE</button>' +
@@ -407,6 +428,7 @@ window._familyBundleLoaded = true;
     bundle.addEventListener('change', function(e) {
       var toggle = e.target.closest('[data-bundle-toggle]');
       if (!toggle) return;
+      bundleChoiceTouched = true;
       toggle.closest('[data-bundle-member]').classList.toggle('disabled', !toggle.checked);
       updateTotal();
       updateIncludesText();
@@ -450,14 +472,25 @@ window._familyBundleLoaded = true;
     var productSection = bundle.closest('[data-section-id]') || bundle.closest('.shopify-section') || document;
     var addToCartBtn = productSection.querySelector('[data-add-to-cart]');
     var stickyAddBtn = document.querySelector('.sticky-atc-bar [data-add-to-cart]');
+    var buyNowBtn = productSection.querySelector('[data-buy-now-button]');
     var productForm = addToCartBtn ? addToCartBtn.closest('form') : null;
-    allBtns = [addToCartBtn, stickyAddBtn].filter(Boolean);
+    var preorderPropertyLabel = bundle.dataset.preorderPropertyLabel || 'Pre-order';
+    var preorderPropertyValue = bundle.dataset.preorderPropertyValue || 'Yes';
+    allBtns = [addToCartBtn, stickyAddBtn, buyNowBtn].filter(Boolean);
 
     function interceptAdd(e) {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
       addBundleToCart();
+      return false;
+    }
+
+    function interceptBuyNow(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      addBundleToCart(true);
       return false;
     }
 
@@ -474,6 +507,9 @@ window._familyBundleLoaded = true;
     if (stickyAddBtn) {
       stickyAddBtn.addEventListener('click', interceptAdd, true);
     }
+    if (buyNowBtn) {
+      buyNowBtn.addEventListener('click', interceptBuyNow, true);
+    }
 
     /* Also remove the theme's form attribute so it can't submit natively */
     if (productForm) {
@@ -483,12 +519,43 @@ window._familyBundleLoaded = true;
 
     var isAdding = false;
 
-    function addBundleToCart() {
+    function applyPreorderProperties(props, variant) {
+      if (!variant || (variant.preorder_enabled !== true && (!parentDefaultPreorder || bundleChoiceTouched))) return props;
+      props[preorderPropertyLabel] = preorderPropertyValue;
+      props._preorder = 'true';
+      return props;
+    }
+
+    function syncPreorderOrderAttribute(hasPreorderItems) {
+      if (!hasPreorderItems) return Promise.resolve();
+
+      return fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({
+          attributes: {
+            'Pre-order order': 'Yes'
+          }
+        })
+      }).then(function(response) {
+        if (!response.ok) throw new Error('Could not mark this order as pre-order.');
+        return response.json();
+      });
+    }
+
+    function addBundleToCart(goToCheckout) {
       if (isAdding) return;
       if (bundleHasOutOfStockSelection()) {
         markOutOfStockMemberErrors();
         hideError();
         updateAtcAvailability();
+        return;
+      }
+      if (
+        window.MCPreorderLimits &&
+        typeof window.MCPreorderLimits.validateBundle === 'function' &&
+        !window.MCPreorderLimits.validateBundle(bundle)
+      ) {
         return;
       }
 
@@ -520,7 +587,7 @@ window._familyBundleLoaded = true;
             hideError();
             return;
           }
-          var props1 = { 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId };
+          var props1 = applyPreorderProperties({ 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId }, variant);
           if (parentHandle) props1['_bundle_parent_handle'] = parentHandle;
           if (giftNote) props1['Gift Message'] = giftNote;
           items.push({ id: variant.id, quantity: 1, properties: props1 });
@@ -531,7 +598,7 @@ window._familyBundleLoaded = true;
             var hasSelection = false;
             chipGroups.forEach(function(g) { if (g.querySelector('.selected')) hasSelection = true; });
             if (!hasSelection) {
-              showError('Please select a size for ' + label);
+              showError('Please choose a ' + label + ' size, or select remove');
               return;
             }
 
@@ -546,7 +613,7 @@ window._familyBundleLoaded = true;
             var qtyInput = row.querySelector('[data-bundle-qty]');
             var qty = parseInt((qtyInput || { value: 1 }).value) || 1;
 
-            var props2 = { 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId };
+            var props2 = applyPreorderProperties({ 'Bundle': cleanTitle, 'For': label, '_bundle_id': bundleId }, variant);
             if (parentHandle) props2['_bundle_parent_handle'] = parentHandle;
             if (giftNote) props2['Gift Message'] = giftNote;
             items.push({ id: variant.id, quantity: qty, properties: props2 });
@@ -555,6 +622,9 @@ window._familyBundleLoaded = true;
       }
 
       if (enabledCount === 0) { showError('Please toggle on at least one family member'); return; }
+      var hasPreorderItems = items.some(function(item) {
+        return item.properties && item.properties._preorder === 'true';
+      });
       hideError();
       isAdding = true;
       allBtns.forEach(function(b) { b.classList.add('btn--loading'); b.disabled = true; });
@@ -568,6 +638,12 @@ window._familyBundleLoaded = true;
       .then(function(res) {
         if (res.status === 422 || res.status === 404) {
           throw new Error(res.description || 'Could not add items');
+        }
+
+        if (goToCheckout) {
+          return syncPreorderOrderAttribute(hasPreorderItems).then(function() {
+            window.location.href = '/checkout';
+          });
         }
 
         // Tell the theme: "a product was added to cart"

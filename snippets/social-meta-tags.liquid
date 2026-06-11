@@ -22,6 +22,8 @@
   {% if collection.image %}
     {% assign social_image = collection.image | image_url %}
   {% endif %}
+{% elsif template.name contains 'page' %}
+    {% assign social_image =  'MANCUB_EMBELLEM_black.jpg' | file_img_url %}
 {% elsif template.name contains 'blog' %}
   {% for article in blog.articles %}
     {% if article.image %}

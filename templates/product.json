@@ -9,15 +9,6 @@
  */
 {
   "sections": {
-    "custom_liquid_YreaU3": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom_liquid.presets.name",
-      "settings": {
-        "custom_liquid": "<script type=\"text/javascript\">\n//<![CDATA[\nwindow.lipscoreInit = function() {\n  lipscore.init({\n    apiKey: \"889c3f3e4b6ac67269261324\"\n  });\n};\n(function() {\n  var scr = document.createElement('script'); scr.async = 1;\n  scr.src = \"//static.lipscore.com/assets/no/lipscore-v1.js\";\n  document.getElementsByTagName('head')[0].appendChild(scr);\n})();\n//]]>\n</script>",
-        "divider_style": "none",
-        "section_padding": "section--vertical-padding-none"
-      }
-    },
     "main": {
       "type": "main-product--default",
       "blocks": {
@@ -37,11 +28,11 @@
             "includes_family": "Includes for the whole Family"
           }
         },
-        "lipscore_reviews_lipscore_product_rating_mP6rx3": {
+        "lipscore_reviews_lipscore_product_rating_rriKkL": {
           "type": "shopify://apps/lipscore-reviews/blocks/lipscore-product-rating/e89bfb0c-cc26-450f-9297-cec873403986",
           "settings": {
-            "use_variant_values": true,
-            "use_all_variant_skus": true
+            "use_variant_values": false,
+            "use_all_variant_skus": false
           }
         },
         "variant_picker": {
@@ -59,13 +50,14 @@
           "type": "family_bundle",
           "settings": {
             "man_label": "MAN Size",
-            "kid_label": "CUB SIZE",
-            "women_label": "WOMAN SIZE",
-            "girl_label": "GIRL CUB SIZE",
+            "kid_label": "CUB Size",
+            "women_label": "WOMAN Size",
+            "girl_label": "GIRL CUB Size",
             "label_font_size": 13,
             "label_font_weight": "600",
             "label_color": "#000000",
             "label_font_family": "heading",
+            "price_position": "left",
             "chip_border_radius": 20,
             "chip_selected_bg": "#1d212a",
             "chip_selected_color": "#ffffff",
@@ -89,6 +81,7 @@
           "type": "inventory-counter",
           "settings": {
             "label": "",
+            "preorder_text": "Shipping date w/c 15th delivery, delivery in time for father’s day.",
             "inventory_max": "40",
             "low_inventory_threshold": "8",
             "show_status_bar": true,
@@ -145,9 +138,25 @@
           "type": "buy_buttons",
           "settings": {
             "show_dynamic_checkout": true,
-            "enable_sticky_atc_bar_desktop": true,
-            "enable_sticky_atc_bar_mobile": true,
+            "preorder_button_text": "Pre-order",
+            "preorder_property_label": "Pre-order",
+            "preorder_property_value": "Yes",
+            "enable_sticky_atc_bar_desktop": false,
+            "enable_sticky_atc_bar_mobile": false,
             "divider_width": "border--thin"
+          }
+        },
+        "buy_now_button": {
+          "type": "buy_now",
+          "settings": {
+            "button_text": "BUY NOW"
+          }
+        },
+        "lipscore_reviews_lipscore_product_testimonial_e7yUNP": {
+          "type": "shopify://apps/lipscore-reviews/blocks/lipscore-product-testimonial/e89bfb0c-cc26-450f-9297-cec873403986",
+          "settings": {
+            "use_variant_values": false,
+            "use_all_variant_skus": false
           }
         },
         "description": {
@@ -183,7 +192,7 @@
             "heading": "Shipping & Returns",
             "heading_tag": "h3",
             "icon": "none",
-            "content": "<p><strong>Standard shipping</strong><br/></p><p>Free Standard Shipping on orders over $250. Select “Free Shipping” at checkout.<br/></p><p><strong>Free Easy Returns</strong></p><p>Need to return an item? We make it easy. Email us and we'll send you a free return label with instructions on how to return.</p>",
+            "content": "<p><strong>Standard shipping</strong><br/></p><p>Free Standard Shipping on orders over $250. Select “Free Shipping” at checkout.<br/></p><p><strong>Returns</strong></p><p>Need to return your order? Please use the link below to start your return process.<a href=\"/pages/returns\" target=\"_blank\" title=\"Returns\">here</a></p>",
             "page_for_content": "",
             "custom_liquid": ""
           }
@@ -212,7 +221,7 @@
             "icon": "none",
             "content": "",
             "page_for_content": "",
-            "custom_liquid": "<div class=\"lipscore-attributes-distribution\"\n  data-ls-product-name=\"{{ product.title | escape }}\"\n  data-ls-brand=\"{{ product.vendor | escape }}\"\n\n  {%- assign parent_id = product.handle -%}\n\n  {%- if product.metafields.custom.parent_bundle != blank -%}\n    {%- assign parent_id = product.metafields.custom.parent_bundle -%}\n  {%- endif -%}\n\n  data-ls-product-id=\"{{ parent_id }}\"\n  data-ls-product-url=\"{{ shop.url }}{{ product.url }}\"\n\n  data-ls-variant-id=\"{{ product.selected_or_first_available_variant.id }}\"\n  data-ls-variant-name=\"{{ product.selected_or_first_available_variant.title | escape }}\"\n  data-ls-sku=\"{{ product.selected_or_first_available_variant.sku }}\"\n\n  data-ls-description=\"{{ product.description | strip_html | truncate: 150 | escape }}\"\n  data-ls-image-url=\"{{ product.featured_image | image_url: width: 600 }}\"\n\n  data-ls-price=\"{{ product.selected_or_first_available_variant.price | money_without_currency }}\"\n  data-ls-price-currency=\"{{ shop.currency }}\"\n\n  data-ls-availability=\"{% if product.selected_or_first_available_variant.available %}1{% else %}0{% endif %}\"\n\n  data-ls-category=\"{{ product.type | escape }}\"\n  data-ls-mpn=\"{{ product.selected_or_first_available_variant.barcode }}\"\n  data-ls-gtin=\"{{ product.selected_or_first_available_variant.barcode }}\">\n</div>"
+            "custom_liquid": "{% assign product_selected_or_first_available_variant = product.selected_or_first_available_variant %}\n{% assign product_sku_list = product.variants | map: 'sku' %}\n{% assign product_sku_values = product_sku_list | uniq | join: ';' %}\n\n{% assign product_name = product.title %}\n{% assign product_brand = product.vendor %}\n{% assign product_id = product.id %}\n{% assign product_url = shop.url | append: product.url %}\n{% assign product_sku = product_sku_values %}\n{% assign product_description = product.description | strip_html | escape %}\n{% assign product_image_url = product | image_url: width: 100, height: 100 %}\n{% assign product_price = product.price | money_without_currency %}\n{% assign product_price_currency = shop.currency %}\n{% assign product_category = product.category.name %}\n\n{% assign product_availability = 0 %}\n{% if product.available %}\n  {% assign product_availability = 1 %}\n{% endif %}\n\n{% assign product_variant_id = '' %}\n{% assign product_variant_name = '' %}\n{% assign product_gtin = '' %}\n\n{%- if block.settings.use_variant_values -%}\n  {% assign product_variant_id = product_selected_or_first_available_variant.id %}\n  {% assign product_variant_name = product_selected_or_first_available_variant.title %}\n  {% assign product_gtin = product_selected_or_first_available_variant.barcode %}\n{%- endif -%}\n\n{% if app.metafields.lipscore.lipscore_product_ident == 'sku' %}\n  {%- if block.settings.use_all_variant_skus -%}\n    {% assign product_id = product_sku_values %}\n  {% else %}\n    {% assign product_id = product_selected_or_first_available_variant.sku %}\n  {%- endif -%}\n{%- endif -%}\n\n{% if app.metafields.lipscore.lipscore_product_ident == 'gtin' %}\n  {% assign product_id = product_gtin %}\n{%- endif -%}\n\n{% if app.metafields.lipscore.lipscore_product_ident == 'vendor' %}\n  {% assign product_id = product_brand %}\n{%- endif -%}\n\n{% assign page_size = block.settings.reviews_per_page %}\n\n<div\n  id=\"lipscore-review-list\"\n  data-ls-product-name=\"{{product_name}}\"\n  data-ls-brand=\"{{product_brand}}\"\n  data-ls-product-id=\"{{product_id}}\"\n  data-ls-product-url=\"{{product_url}}\"\n  data-ls-variant-id=\"{{product_variant_id}}\"\n  data-ls-variant-name=\"{{product_variant_name}}\"\n  data-ls-sku=\"{{product_sku}}\"\n  data-ls-description=\"{{product_description}}\"\n  data-ls-image-url=\"{{product_image_url}}\"\n  data-ls-price=\"{{product_price}}\"\n  data-ls-price-currency=\"{{product_price_currency}}\"\n  data-ls-availability=\"{{product_availability}}\"\n  data-ls-category=\"{{product_category}}\"\n  data-ls-gtin=\"{{product_gtin}}\"\n  data-ls-page-size=\"{{page_size}}\"\n></div>"
           }
         },
         "product_callouts-1": {
@@ -256,7 +265,7 @@
             "icon_4": "chat",
             "text_4": "<p>Have questions about fit? <a href=\"/pages/contact\" title=\"Contact\">Contact us</a></p>",
             "icon_5": "moving-truck",
-            "text_5": "<p>Free shipping on orders over $250</p>",
+            "text_5": "",
             "icon_6": "padlock",
             "text_6": "<p>Secure payment</p>",
             "display_as_collapsible_row": false,
@@ -287,7 +296,7 @@
       },
       "block_order": [
         "product_header",
-        "lipscore_reviews_lipscore_product_rating_mP6rx3",
+        "lipscore_reviews_lipscore_product_rating_rriKkL",
         "variant_picker",
         "family_bundle",
         "size_guide_NdkWdL",
@@ -296,6 +305,8 @@
         "quantity_selector",
         "product_callouts-2",
         "buy_buttons",
+        "buy_now_button",
+        "lipscore_reviews_lipscore_product_testimonial_e7yUNP",
         "description",
         "accordion_3JBpGG",
         "accordion_WkKmhA",
@@ -305,6 +316,9 @@
         "product_callouts",
         "featured_products",
         "share"
+      ],
+      "custom_css": [
+        ".inventory-counter[data-stock-category=\"empty\"] .inventory-counter__message {color: #000000;}"
       ],
       "settings": {
         "enable_sticky_product_details": true,
@@ -532,6 +546,7 @@
     },
     "recommendations": {
       "type": "recommended-products",
+      "disabled": true,
       "settings": {
         "title": "How About These?",
         "heading_tag": "h2",
@@ -542,6 +557,21 @@
         "enable_animation": true,
         "divider_style": "none",
         "section_padding": "section--vertical-padding-none"
+      }
+    },
+    "selected_product_grid_MYLmjT": {
+      "type": "selected-product-grid",
+      "name": "Product Grid",
+      "settings": {
+        "title": "How About These?",
+        "heading_tag": "h2",
+        "subheading": "<p>More Products You'll Both Look Good In</p>",
+        "maximum_products": 4,
+        "columns": "4",
+        "mobile_columns": "2",
+        "enable_animation": false,
+        "divider_style": "none",
+        "section_padding": "section--vertical-padding-top-bottom"
       }
     },
     "1774608964e1dc0cb7": {
@@ -567,12 +597,12 @@
     }
   },
   "order": [
-    "custom_liquid_YreaU3",
     "main",
     "product_tabs",
     "multi-column",
     "17744428347e665114",
     "recommendations",
+    "selected_product_grid_MYLmjT",
     "1774608964e1dc0cb7"
   ]
 }

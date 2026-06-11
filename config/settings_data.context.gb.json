@@ -1,0 +1,24 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "context": {
+    "market": "gb"
+  },
+  "current": {
+    "enable_free_shipping_bar": true,
+    "cross_sells_heading": "Complete your look",
+    "cross_sells_recommendations_type": "product-list",
+    "collection": "",
+    "product_list": [
+      "unbreakable-sunglasses",
+      "matching-family-sunglasses"
+    ]
+  }
+}

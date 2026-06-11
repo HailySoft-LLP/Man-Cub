@@ -143,6 +143,9 @@
               data-localization-option-count="{{ localization_option_count }}"
               style="--item-height: 38px"
             >
+              {% assign allowed_countries = "GB,US,FR,DE,ES,IT,NL,AU,AE,CA,BB" | split: "," %}
+
+
               {%- if country_selector -%}
                 <li class="drawer-menu__item localization-item-trigger" data-list-item>
                   <a class="drawer-menu__link fs-body-50" href="#" data-item="viewCurrency">
@@ -166,25 +169,30 @@
                       </span>
                     </li>
                     {% for country in localization.available_countries %}
-                      <li class="drawer-menu__item localization-item" data-list-item>
-                        <a
-                          class="drawer-menu__link drawer-menu__link--cb"
-                          href="#"
-                          data-item="currency"
-                          data-value="{{ country.iso_code }}"
-                        >
-                          <span class="flag-icon flag-icon-{{ country.iso_code | handleize }}"></span>
-                          <span>
-                            {{- country.name }} ({{ country.currency.iso_code }}
-                            {{ country.currency.symbol }})
-                          </span>
-                          {% if country.iso_code == localization.country.iso_code %}
-                            {% render 'icon', icon: 'checkmark', class: 'drawer-menu__checkmark-icon' %}
-                          {% endif %}
-                        </a>
-                      </li>
+                      {% if allowed_countries contains country.iso_code %}
+
+                        <li class="drawer-menu__item localization-item" data-list-item>
+                          <a
+                            class="drawer-menu__link drawer-menu__link--cb"
+                            href="#"
+                            data-item="currency"
+                            data-value="{{ country.iso_code }}"
+                          >
+                            <span class="flag-icon flag-icon-{{ country.iso_code | handleize }}"></span>
+                            <span>
+                              {{- country.name }} ({{ country.currency.iso_code }}
+                              {{ country.currency.symbol }})
+                            </span>
+                            {% if country.iso_code == localization.country.iso_code %}
+                              {% render 'icon', icon: 'checkmark', class: 'drawer-menu__checkmark-icon' %}
+                            {% endif %}
+                          </a>
+
+                       </li>
+                      {% endif%}
                     {%- endfor -%}
                   </ul>
+
                 </li>
                 {% capture localization_inputs %}
                   {{ localization_inputs }}

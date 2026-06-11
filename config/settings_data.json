@@ -51,11 +51,11 @@
     "swatch_image_fit": "cover",
     "color_text_sale_badge": "#d21404",
     "sale_badge_format": "sale_text",
-    "custom_product_badge_group_1_tag_names": "Conscious",
+    "custom_product_badge_group_1_tag_names": "Test",
     "custom_product_badge_group_1_color": "#74c794",
     "custom_product_badge_group_2_tag_names": "Best Seller",
     "custom_product_badge_group_2_color": "#58c3ff",
-    "custom_product_badge_group_3_tag_names": "New, Popular",
+    "custom_product_badge_group_3_tag_names": "New In, Popular",
     "custom_product_badge_group_3_color": "#000000",
     "custom_product_badge_group_4_tag_names": "",
     "custom_product_badge_group_4_color": "#df0a0a",
@@ -71,9 +71,9 @@
     "product_listing_show_discount": true,
     "product_listing_discount_format": "sale_text",
     "product_listing_badge_position": "top_right",
-    "enable_free_shipping_bar": true,
+    "enable_free_shipping_bar": false,
     "free_shipping_threshold": "100",
-    "enable_cross_sells": true,
+    "enable_cross_sells": false,
     "cross_sells_heading": "Last chance to save",
     "cross_sells_recommendations_type": "metafield",
     "collection": "sale",
@@ -94,9 +94,17 @@
         "disabled": false,
         "settings": {}
       },
-      "14060646107696862457": {
-        "type": "shopify://apps/judge-me-reviews/blocks/judgeme_core/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-        "disabled": true,
+      "9215962420185474525": {
+        "type": "shopify://apps/lipscore-reviews/blocks/lipscore-init/e89bfb0c-cc26-450f-9297-cec873403986",
+        "disabled": false,
+        "settings": {
+          "init_repeat": true,
+          "init_repeat_delay": 0.3
+        }
+      },
+      "144831480468751239": {
+        "type": "shopify://apps/essential-upsell/blocks/app-embed/50627fd9-24fd-4250-8614-accc12826d80",
+        "disabled": false,
         "settings": {}
       }
     }

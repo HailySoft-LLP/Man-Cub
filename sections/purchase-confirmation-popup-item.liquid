@@ -4,6 +4,10 @@
   </h3>
 
   {%- for item in cart.items -%}
+    {%- assign item_is_preorder = false -%}
+    {%- if item.properties['_preorder'] == 'true' or item.properties['Pre-order'] != blank -%}
+      {%- assign item_is_preorder = true -%}
+    {%- endif -%}
     <div
       class="purchase-confirmation-popup__item hidden animation--purchase-confirmation-item"
       data-product-key="{{ item.key }}"
@@ -21,6 +25,9 @@
           <h4 class="purchase-confirmation-popup__product-title fs-product-card-title">
             {{ item.product.title }}
           </h4>
+          {%- if item_is_preorder -%}
+            <span class="mc-preorder-badge purchase-confirmation-popup__preorder-badge fs-body-50">Pre-order</span>
+          {%- endif -%}
 
           {% unless item.product.has_only_default_variant %}
             <p class="purchase-confirmation-popup__product-variant fs-body-50 t-opacity-60">{{ item.variant.title }}</p>
@@ -39,7 +46,7 @@
               {% for p in item.properties %}
                 {% # Don't show property if property name begins with an underscore, or if property is blank. %}
                 {% assign first_char = p.first | slice: 0 %}
-                {% unless p.last == blank or first_char == '_' %}
+                {% unless p.last == blank or first_char == '_' or p.first == 'Pre-order' %}
                   <p>
                     {{ p.first }}:
 

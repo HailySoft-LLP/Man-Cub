@@ -21,7 +21,7 @@
               inert
             {% endunless %}
           >
-            {% render 'product-card-mini', prod: block.settings.product_item, index: forloop.index, image_sizes: image_sizes %}
+            {% render 'product-card-mini', prod: block.settings.product_item, index: forloop.index, image_sizes: image_sizes, use_bundle_from_price: true %}
           </div>
         {%- else -%}
           <div

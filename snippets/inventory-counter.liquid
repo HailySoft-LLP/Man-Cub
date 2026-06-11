@@ -2,7 +2,18 @@
   assign inventory_max = block_settings.inventory_max
   assign low_inventory_threshold = block_settings.low_inventory_threshold
   assign label = block_settings.label
+  assign preorder_text = block_settings.preorder_text | default: 'This item is available for pre-order.'
+  assign has_preorder_variant = false
   assign label_classes = 'fs-body-100'
+
+  for variant in product.variants
+    assign preorder_enabled_value = variant.metafields.custom.preorder_enabled.value
+    assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase
+    if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes'
+      assign has_preorder_variant = true
+      break
+    endif
+  endfor
 
   unless show_label
     assign label_classes = label_classes | append: ' visually-hidden'
@@ -19,6 +30,7 @@
   data-show-status-bar="{{ block_settings.show_status_bar }}"
   data-show-untracked-quantity="{{ block_settings.show_untracked_quantity }}"
   data-unavailable-text="{{ 'products.inventory.unavailable' | t }}"
+  data-preorder="{{ has_preorder_variant }}"
   {{ block.shopify_attributes }}
 >
   <div class="product__label-wrapper">
@@ -34,7 +46,21 @@
     {
       "inventory": {
         {%- for variant in product.variants -%}
-          {%- if variant.available -%}
+          {%- liquid
+            assign preorder_enabled_value = variant.metafields.custom.preorder_enabled.value
+            assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase
+            assign variant_is_preorder = false
+            if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes'
+              assign variant_is_preorder = true
+            endif
+          -%}
+          {%- assign inventory_management_value = variant.inventory_management -%}
+          {%- if variant_is_preorder and preorder_text != blank -%}
+            {%- capture inventory_message -%}{{ preorder_text }}{%- endcapture -%}
+            {%- if inventory_management_value == blank -%}
+              {%- assign inventory_management_value = 'preorder' -%}
+            {%- endif -%}
+          {%- elsif variant.available -%}
             {%- if variant.inventory_management == nil and block_settings.show_untracked_quantity -%}
               {%- capture inventory_message -%}{{ 'products.inventory.in_stock' | t }}{%- endcapture -%}
             {%- else -%}
@@ -58,7 +84,7 @@
             {%- capture inventory_message -%}{{ 'products.inventory.sold_out' | t }}{%- endcapture -%}
           {%- endif -%}
           "{{ variant.id }}": {
-            "inventory_management": {{ variant.inventory_management | json }},
+            "inventory_management": {{ inventory_management_value | json }},
             "inventory_policy": {{ variant.inventory_policy | json }},
             "inventory_quantity": {{ variant.inventory_quantity | json }},
             "inventory_message": {{ inventory_message | json }}

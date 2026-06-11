@@ -10,7 +10,7 @@
   <label class="visually-hidden" for="Quantity-Input-{{ id }}">{{ 'products.product.quantity' | t }}</label>
   <input
     type="number"
-    name="updates[]"
+    name="{% if update_key != blank %}updates[{{ update_key }}]{% else %}updates[]{% endif %}"
     id="Quantity-Input-{{ id }}"
     value="{{ initial_value }}"
     min="1"

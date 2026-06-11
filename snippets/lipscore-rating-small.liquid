@@ -1,0 +1,63 @@
+{% assign product_selected_or_first_available_variant = product.selected_or_first_available_variant %}
+{% assign product_sku_list = product.variants | map: 'sku' %}
+{% assign product_sku_values = product_sku_list | uniq | join: ';' %}
+
+{% assign product_name = product.title %}
+{% assign product_brand = product.vendor %}
+{% assign product_id = product.id %}
+{% assign product_url = shop.url | append: product.url %}
+{% assign product_sku = product_sku_values %}
+{% assign product_description = product.description | strip_html | escape %}
+{% assign product_image_url = product | image_url: width: 100, height: 100 %}
+{% assign product_price = product.price | money_without_currency %}
+{% assign product_price_currency = shop.currency %}
+{% assign product_category = product.category.name %}
+
+{% assign product_availability = 0 %}
+{% if product.available %}
+  {% assign product_availability = 1 %}
+{% endif %}
+
+{% assign product_variant_id = '' %}
+{% assign product_variant_name = '' %}
+{% assign product_gtin = '' %}
+
+{%- if block.settings.use_variant_values -%}
+  {% assign product_variant_id = product_selected_or_first_available_variant.id %}
+  {% assign product_variant_name = product_selected_or_first_available_variant.title %}
+  {% assign product_gtin = product_selected_or_first_available_variant.barcode %}
+{%- endif -%}
+
+{% if app.metafields.lipscore.lipscore_product_ident == 'sku' %}
+  {%- if block.settings.use_all_variant_skus -%}
+    {% assign product_id = product_sku_values %}
+  {% else %}
+    {% assign product_id = product_selected_or_first_available_variant.sku %}
+  {%- endif -%}
+{%- endif -%}
+
+{% if app.metafields.lipscore.lipscore_product_ident == 'gtin' %}
+  {% assign product_id = product_gtin %}
+{%- endif -%}
+
+{% if app.metafields.lipscore.lipscore_product_ident == 'vendor' %}
+  {% assign product_id = product_brand %}
+{%- endif -%}
+
+<span
+  class="lipscore-rating-small"
+  data-ls-product-name="{{product_name}}"
+  data-ls-brand="{{product_brand}}"
+  data-ls-product-id="{{product_id}}"
+  data-ls-product-url="{{product_url}}"
+  data-ls-variant-id="{{product_variant_id}}"
+  data-ls-variant-name="{{product_variant_name}}"
+  data-ls-sku="{{product_sku}}"
+  data-ls-description="{{product_description}}"
+  data-ls-image-url="{{product_image_url}}"
+  data-ls-price="{{product_price}}"
+  data-ls-price-currency="{{product_price_currency}}"
+  data-ls-availability="{{product_availability}}"
+  data-ls-category="{{product_category}}"
+  data-ls-gtin="{{product_gtin}}"
+></span>

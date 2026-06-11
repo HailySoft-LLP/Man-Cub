@@ -34,6 +34,13 @@
     assign priority_4 = block.settings.priority_4 | default: 'girl'
     assign priority_order = priority_1 | append: ',' | append: priority_2 | append: ',' | append: priority_3 | append: ',' | append: priority_4
     assign priority_list = priority_order | split: ','
+    assign product_preorder_enabled_value = product.metafields.custom.preorder_enabled.value
+    assign product_preorder_enabled_string = product_preorder_enabled_value | append: '' | downcase
+    assign product_preorder_enabled = false
+
+    if product_preorder_enabled_value == true or product_preorder_enabled_string == 'true' or product_preorder_enabled_string == 'yes'
+      assign product_preorder_enabled = true
+    endif
   -%}
 
   {%- comment -%} Pre-check stock for all members {%- endcomment -%}
@@ -74,6 +81,9 @@
     data-money-format="{{ shop.money_format | escape }}"
     data-parent-title="{{ product.title | escape }}"
     data-parent-handle="{{ product.handle }}"
+    data-parent-preorder-enabled="{{ product_preorder_enabled }}"
+    data-preorder-property-label="Pre-order"
+    data-preorder-property-value="Yes"
     {{ block.shopify_attributes }}
     style="
       --bundle-label-size: {{ block.settings.label_font_size | default: 13 }}px;
@@ -118,6 +128,10 @@
                     <span class="family-bundle__member-label fs-body-75">{{ kid_label }}</span>
                     {% comment %} <span class="family-bundle__member-title fs-body-75 t-opacity-70">{{ kid_product.title }}</span> {% endcomment %}
                   </div>
+
+                  {% if kv.compare_at_price > kv.price %}
+                  <span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price>{{ kv.compare_at_price | money }}</span>
+                  {% endif %}
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ kv.price | money }}</span>
                   <label class="family-bundle__toggle">
                     <input type="checkbox" data-bundle-toggle checked>
@@ -151,10 +165,10 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ kid_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add additional {{ kid_label }}</button>
                   </div>
                 {%- endunless -%}
-                <script type="application/json" data-bundle-variants>[{%- for variant in kid_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
+                <script type="application/json" data-bundle-variants>{% render 'preorder-variant-data-json', product: kid_product %}</script>
               </div>
             {%- endif -%}
 
@@ -176,6 +190,9 @@
                     <span class="family-bundle__member-label fs-body-75">{{ girl_label }}</span>
                     {% comment %} <span class="family-bundle__member-title fs-body-75 t-opacity-70">{{ girl_product.title }}</span> {% endcomment %}
                   </div>
+                  {% if gv.compare_at_price > gv.price %}
+                  <span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price>{{ gv.compare_at_price | money }}</span>
+                  {% endif %}
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ gv.price | money }}</span>
                   <label class="family-bundle__toggle">
                     <input type="checkbox" data-bundle-toggle>
@@ -209,10 +226,10 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ girl_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add additional {{ girl_label }}</button>
                   </div>
                 {%- endunless -%}
-                <script type="application/json" data-bundle-variants>[{%- for variant in girl_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
+                <script type="application/json" data-bundle-variants>{% render 'preorder-variant-data-json', product: girl_product %}</script>
               </div>
             {%- endif -%}
 
@@ -234,6 +251,9 @@
                     <span class="family-bundle__member-label fs-body-75">{{ man_label }}</span>
                     {% comment %} <span class="family-bundle__member-title fs-body-75 t-opacity-70">{{ man_product.title }}</span> {% endcomment %}
                   </div>
+                  {% if mv.compare_at_price > mv.price %}
+                  <span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price>{{ mv.compare_at_price | money }}</span>
+                  {% endif %}
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ mv.price | money }}</span>
                   <label class="family-bundle__toggle">
                     <input type="checkbox" data-bundle-toggle checked>
@@ -267,10 +287,10 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ man_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add additional {{ man_label }}</button>
                   </div>
                 {%- endunless -%}
-                <script type="application/json" data-bundle-variants>[{%- for variant in man_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
+                <script type="application/json" data-bundle-variants>{% render 'preorder-variant-data-json', product: man_product %}</script>
               </div>
             {%- endif -%}
 
@@ -292,6 +312,9 @@
                     <span class="family-bundle__member-label fs-body-75">{{ women_label }}</span>
                     {% comment %} <span class="family-bundle__member-title fs-body-75 t-opacity-70">{{ women_product.title }}</span> {% endcomment %}
                   </div>
+                  {% if wv.compare_at_price > wv.price %}
+                  <span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price>{{ wv.compare_at_price | money }}</span>
+                  {% endif %}
                   <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>{{ wv.price | money }}</span>
                   <label class="family-bundle__toggle">
                     <input type="checkbox" data-bundle-toggle>
@@ -325,10 +348,10 @@
                       </div>
                     {%- endfor -%}
                     </div>
-                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add a different {{ women_label }}</button>
+                    <button type="button" class="family-bundle__add-another" data-bundle-add-another>+ add additional {{ women_label }}</button>
                   </div>
                 {%- endunless -%}
-                <script type="application/json" data-bundle-variants>[{%- for variant in women_product.variants -%}{%- assign real_available = false -%}{%- if variant.available -%}{%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}{%- assign real_available = true -%}{%- endif -%}{%- endif -%}{"id":{{ variant.id }},"title":{{ variant.title | json }},"price":{{ variant.price }},"available":{{ real_available }},"inventory_quantity":{{ variant.inventory_quantity | default: 0 }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}}{% unless forloop.last %},{% endunless %}{%- endfor -%}]</script>
+                <script type="application/json" data-bundle-variants>{% render 'preorder-variant-data-json', product: women_product %}</script>
               </div>
             {%- endif -%}
 

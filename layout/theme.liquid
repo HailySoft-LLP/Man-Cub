@@ -118,4 +118,6 @@
     onload="this.onload=null;this.rel='stylesheet'"
   >
   <noscript><link rel="stylesheet" href="{{ 'theme-deferred.css' | asset_url }}"></noscript>
+  {% render 'lipscore-custom-scripts' %}
+  {% render 'preorder-cart-attributes' %}
 </html>

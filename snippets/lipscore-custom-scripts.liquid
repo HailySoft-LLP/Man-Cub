@@ -1,0 +1,30 @@
+<script>
+window.addEventListener('load', () => {
+  if (!document.querySelector('#lipscore-rating')) {
+    return;
+  }
+
+  const interval = setInterval(() => {
+    const reviewLink = document.querySelector('.lipscore-rating-review-link');
+    if (reviewLink) {
+      clearInterval(interval);
+      
+      reviewLink.addEventListener('click', () => {
+        const reviewList = document.querySelector('#lipscore-review-list');
+        const accordionInner = reviewList.closest('.accordion__inner');
+        
+        if (accordionInner.dataset.open === 'true') {
+          return;
+        }
+        
+        const accordionLabel = accordionInner.querySelector('.accordion__label');
+        accordionLabel.click();
+        
+        setTimeout(() => {
+          reviewLink.click();
+        }, 300);
+      });
+    }
+  }, 100);
+});
+</script>

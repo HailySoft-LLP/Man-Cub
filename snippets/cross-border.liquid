@@ -12,6 +12,8 @@
   * defer_styles: indicates this UI is not visible on page load (below the fold, in popup, etc) and
                   css loading should be deferred (helps optimize CSS assets)
 {%- endcomment -%}
+{% assign allowed_countries = "GB,US,FR,DE,ES,IT,NL,AU,AE,CA,BB" | split: "," %}
+
 {%- if show_locale or show_country -%}
   {%- form 'localization', class: 'disclosure-form' -%}
     <div class="disclosure-form__inner">
@@ -40,24 +42,25 @@
               data-disclosure-list
             >
               {% for locale in form.available_locales %}
-                <li class="disclosure-list__item {% if locale.iso_code == form.current_locale.iso_code %}disclosure-list__item--current{% endif %}">
-                  <a
-                    class="disclosure-list__option no-transition fs-body-75"
-                    href="#"
-                    lang="{{ locale.iso_code }}"
-                    {% if locale.iso_code == form.current_locale.iso_code %}
-                      aria-current="true"
-                    {% endif %}
-                    data-value="{{ locale.iso_code }}"
-                    data-disclosure-option
-                  >
-                    <span class="disclosure-list__option-label">{{ locale.endonym_name | capitalize }}</span>
+                
+                  <li class="disclosure-list__item {% if locale.iso_code == form.current_locale.iso_code %}disclosure-list__item--current{% endif %}">
+                    <a
+                      class="disclosure-list__option no-transition fs-body-75"
+                      href="#"
+                      lang="{{ locale.iso_code }}"
+                      {% if locale.iso_code == form.current_locale.iso_code %}
+                        aria-current="true"
+                      {% endif %}
+                      data-value="{{ locale.iso_code }}"
+                      data-disclosure-option
+                    >
+                      <span class="disclosure-list__option-label">{{ locale.endonym_name | capitalize }}</span>
 
-                    {%- if locale.iso_code == form.current_locale.iso_code -%}
-                      {% render 'icon', icon: 'checkmark' %}
-                    {%- endif -%}
-                  </a>
-                </li>
+                      {%- if locale.iso_code == form.current_locale.iso_code -%}
+                        {% render 'icon', icon: 'checkmark' %}
+                      {%- endif -%}
+                    </a>
+                  </li>
               {%- endfor -%}
             </ul>
             <input
@@ -98,6 +101,7 @@
               data-disclosure-list
             >
               {% for country in localization.available_countries %}
+                {% if allowed_countries contains country.iso_code %}
                 <li class="disclosure-list__item {% if country.iso_code == localization.country.iso_code %}disclosure-list__item--current{% endif %}">
                   <a
                     class="disclosure-list__option no-transition fs-body-75"
@@ -120,6 +124,8 @@
                     {%- endif -%}
                   </a>
                 </li>
+                
+                {% endif %}
               {%- endfor -%}
             </ul>
             <input

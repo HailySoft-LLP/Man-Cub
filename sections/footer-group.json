@@ -288,6 +288,7 @@
             "show_title_on_desktop": true,
             "enable_collect_customer_name": false,
             "text": "<p>Get 10% off your first order.</p>",
+            "klaviyo_form_id": "QWEKFk",
             "show_social_icons": true,
             "enable_follow_on_shop": true
           }

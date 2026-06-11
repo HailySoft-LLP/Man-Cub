@@ -1,0 +1,66 @@
+<script>
+  (function() {
+    var attributeName = 'Pre-order order';
+    var attributeValue = 'Yes';
+    var isSyncing = false;
+
+    function hasPreorderItem(cart) {
+      if (!cart || !Array.isArray(cart.items)) return false;
+
+      return cart.items.some(function(item) {
+        var properties = item.properties || {};
+        return properties._preorder === 'true' || properties['Pre-order'];
+      });
+    }
+
+    function getCart() {
+      return fetch('/cart.js', {
+        method: 'GET',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      }).then(function(response) {
+        return response.json();
+      });
+    }
+
+    function syncCart(cart) {
+      if (!cart || isSyncing) return;
+
+      var nextValue = hasPreorderItem(cart) ? attributeValue : '';
+      var currentValue = cart.attributes ? cart.attributes[attributeName] || '' : '';
+
+      if (currentValue === nextValue) return;
+
+      isSyncing = true;
+      fetch('/cart/update.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({
+          attributes: {
+            'Pre-order order': nextValue
+          }
+        })
+      }).finally(function() {
+        isSyncing = false;
+      });
+    }
+
+    function fetchAndSync() {
+      getCart().then(syncCart).catch(function() {});
+    }
+
+    document.addEventListener('cart:updated', function(event) {
+      var cart = event.detail && event.detail.cart;
+      if (cart) {
+        syncCart(cart);
+      } else {
+        fetchAndSync();
+      }
+    });
+
+    document.addEventListener('apps:product-added-to-cart', function() {
+      window.setTimeout(fetchAndSync, 300);
+    });
+
+    document.addEventListener('DOMContentLoaded', fetchAndSync);
+  })();
+</script>

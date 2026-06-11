@@ -1,0 +1,36 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "context": {
+    "market": "gb"
+  },
+  "parent": "header-group.json",
+  "sections": {
+    "announcement-bar": {
+      "settings": {},
+      "blocks": {
+        "announcement_rXNBH": {
+          "type": "announcement",
+          "disabled": false,
+          "settings": {
+            "title": "<p>Free shipping on orders over |amount|</p>",
+            "title_mobile": "<p>Free shipping on orders over |amount|</p>",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement_rXNBH",
+        "announcement-bar-1",
+        "announcement_HW3c9q"
+      ]
+    }
+  }
+}

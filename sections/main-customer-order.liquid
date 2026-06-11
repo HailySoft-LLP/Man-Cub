@@ -57,6 +57,14 @@
           </thead>
           <tbody>
             {%- for line_item in order.line_items -%}
+              {%- assign line_item_is_preorder = false -%}
+              {%- for property in line_item.properties -%}
+                {%- if property.first == '_preorder' and property.last == 'true' -%}
+                  {%- assign line_item_is_preorder = true -%}
+                {%- elsif property.first == 'Pre-order' and property.last != blank -%}
+                  {%- assign line_item_is_preorder = true -%}
+                {%- endif -%}
+              {%- endfor -%}
               <tr id="{{ line_item.key }}">
                 <td scope="row" data-label="{{ 'customer.order.product' | t }}">
                   <div class="order__product">
@@ -73,6 +81,9 @@
                         <h4 class="fs-product-card-title">
                           {{ line_item.product.title | link_to: line_item.product.url }}
                         </h4>
+                        {%- if line_item_is_preorder -%}
+                          <span class="mc-preorder-badge order__preorder-badge fs-body-50">Pre-order</span>
+                        {%- endif -%}
                         {%- unless line_item.product.has_only_default_variant -%}
                           <div class="fs-body-50 t-opacity-60">{{ line_item.variant.title }}</div>
                         {%- endunless -%}

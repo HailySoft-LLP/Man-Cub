@@ -29,20 +29,11 @@
             "title_mobile": "",
             "link": ""
           }
-        },
-        "5a2005ed-4438-4c3e-9549-f61724bea26f": {
-          "type": "announcement",
-          "settings": {
-            "title": "<p>Free shipping on orders over |amount|</p>",
-            "title_mobile": "<p>|amount| is free shipping</p>",
-            "link": ""
-          }
         }
       },
       "block_order": [
         "announcement-bar-1",
-        "announcement_HW3c9q",
-        "5a2005ed-4438-4c3e-9549-f61724bea26f"
+        "announcement_HW3c9q"
       ],
       "settings": {
         "enable_sticky_announcement_bar": "desktop-and-mobile",

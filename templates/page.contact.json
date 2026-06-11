@@ -40,7 +40,7 @@
           "type": "text_area",
           "settings": {
             "title": "Message",
-            "placeholder": "This is a demo. Your message will not be sent to a real store.",
+            "placeholder": "",
             "required": true,
             "height": 180,
             "width": "full"

@@ -20,6 +20,24 @@
     assign aspect_ratio = settings.product_listing_aspect_ratio
   endif
 
+  assign product_card_mini_bundle_price = blank
+
+  if use_bundle_from_price and prod != blank and prod.price == 0
+    assign pcm_kid = prod.metafields.custom.kid_product.value
+    assign pcm_man = prod.metafields.custom.man_product.value
+
+    if pcm_kid != blank or pcm_man != blank
+      if pcm_kid != blank
+        assign product_card_mini_bundle_price = pcm_kid.price
+      endif
+      if pcm_man != blank
+        if product_card_mini_bundle_price == blank or pcm_man.price < product_card_mini_bundle_price
+          assign product_card_mini_bundle_price = pcm_man.price
+        endif
+      endif
+    endif
+  endif
+
   if prod.has_only_default_variant
     assign product_has_variants = false
   else
@@ -135,6 +153,8 @@
 
         {% if placeholder or prod == blank %}
           {{ 9999 | money }}
+        {% elsif product_card_mini_bundle_price != blank %}
+          <span class="product-card-mini__price">From {{ product_card_mini_bundle_price | money }}</span>
         {% elsif prod.compare_at_price > prod.price %}
           <p class="product-card-mini__price">
             <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>

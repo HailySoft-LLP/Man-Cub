@@ -117,6 +117,15 @@
           </div>
         {%- endif -%}
 
+      {%- when 'buy_now' -%}
+        {%- if prod != blank -%}
+          {%- render 'product-block-buy-now',
+            block: block,
+            product: prod,
+            section: section
+          -%}
+        {%- endif -%}
+
       {%- when 'description' -%}
         {%- render 'product-block-description', product: prod, block: block, block_settings: block.settings -%}
 

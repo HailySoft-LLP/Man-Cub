@@ -21,6 +21,10 @@
             {%- assign item_bundle_id = item.properties['_bundle_id'] -%}
             {%- assign item_bundle_name = item.properties['Bundle'] -%}
             {%- assign item_bundle_role = item.properties['For'] -%}
+            {%- assign item_is_preorder = false -%}
+            {%- if item.properties['_preorder'] == 'true' or item.properties['Pre-order'] != blank -%}
+              {%- assign item_is_preorder = true -%}
+            {%- endif -%}
 
             {%- if item_bundle_id != blank -%}
               {%- comment -%} BUNDLE ITEM — check if we already rendered this bundle {%- endcomment -%}
@@ -58,6 +62,9 @@
                       <h4 class="cart__form-item-title fs-product-card-title">
                         <a href="{{ item.url }}">{{ item.product.title }}</a>
                       </h4>
+                      {%- if item_is_preorder -%}
+                        <span class="mc-preorder-badge cart__preorder-badge fs-body-50">Pre-order</span>
+                      {%- endif -%}
 
                       {% unless item.product.has_only_default_variant %}
                         <p class="cart__form-item-variant fs-body-50 t-opacity-60">{{ item.variant.title }}</p>
@@ -75,7 +82,7 @@
                         <div class="cart__form-item-properties fs-body-60 t-opacity-80">
                           {% for p in item.properties %}
                             {% assign first_char = p.first | slice: 0 %}
-                            {% unless p.last == blank or first_char == '_' %}
+                            {% unless p.last == blank or first_char == '_' or p.first == 'Pre-order' %}
                               <p>
                                 {{ p.first }}:
                                 {% if p.last contains '/uploads/' %}
@@ -166,7 +173,7 @@
                         </p>
                       {%- endif -%}
                     {%- endif -%}
-                    {% render 'quantity-input', id: item.id, initial_value: item.quantity %}
+                    {% render 'quantity-input', id: item.id, initial_value: item.quantity, update_key: item.key %}
                     <div class="cart__form-item-remove-wrapper">
                       <button type="button" data-remove-item class="cart__form-item-remove fs-body-75 t-subdued btn btn--text-link">
                         {{ 'cart.general.remove' | t }}

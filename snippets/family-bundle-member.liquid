@@ -9,6 +9,9 @@
       <span class="family-bundle__member-label fs-body-75">{{ fb_label }}</span>
       {% comment %} <span class="family-bundle__member-title fs-body-100">{{ fb_product.title }}</span> {% endcomment %}
     </div>
+    {% if fb_product.selected_or_first_available_variant.compare_at_price > fb_product.selected_or_first_available_variant.price %}
+    <span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price >{{ fb_product.selected_or_first_available_variant.compare_at_price | money }}</span>
+    {% endif %}
     <span class="family-bundle__member-price fs-body-100" data-bundle-member-price>
       {{ fb_product.selected_or_first_available_variant.price | money }}
     </span>

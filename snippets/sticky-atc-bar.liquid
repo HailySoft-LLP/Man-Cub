@@ -14,11 +14,23 @@
 {%- endcomment -%}
 
 {%- liquid
+  assign current_variant_is_preorder = false
+  assign product_preorder_enabled = false
+  assign preorder_button_text = local_settings.preorder_button_text | default: 'Pre-order'
   assign product_available_label = 'products.product.add_to_cart' | t
   assign product_unavailable_label = 'products.product.sold_out' | t
 
-  if template.suffix == 'preorder'
-    assign product_available_label = 'products.product.preorder' | t
+  assign product_preorder_enabled_value = prod.metafields.custom.preorder_enabled.value
+  assign product_preorder_enabled_string = product_preorder_enabled_value | append: '' | downcase
+  if product_preorder_enabled_value == true or product_preorder_enabled_string == 'true' or product_preorder_enabled_string == 'yes'
+    assign product_preorder_enabled = true
+  endif
+
+  assign preorder_enabled_value = current_variant.metafields.custom.preorder_enabled.value
+  assign preorder_enabled_string = preorder_enabled_value | append: '' | downcase
+  if preorder_enabled_value == true or preorder_enabled_string == 'true' or preorder_enabled_string == 'yes' or product_preorder_enabled
+    assign current_variant_is_preorder = true
+    assign product_available_label = preorder_button_text
   endif
 
   capture options_csl
@@ -105,7 +117,10 @@
         aria-label="{% unless current_variant.available %}{{ product_unavailable_label }}{% else %}{{ product_available_label }}{% endunless %}"
         class="product-form__cart-submit btn btn--medium btn--full btn--primary"
         data-add-to-cart
-        data-lang-available="{{ product_available_label }}"
+        data-product-preorder="{{ current_variant_is_preorder }}"
+        data-normal-text="{{ 'products.product.add_to_cart' | t | escape }}"
+        data-preorder-text="{{ preorder_button_text | escape }}"
+        data-lang-available="{{ product_available_label | escape }}"
         data-lang-unavailable="{{ 'product.unavailable' | t }}"
         data-lang-sold-out="{{ 'product.sold_out' | t }}"
       >

@@ -1,0 +1,205 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign button_text = block.settings.button_text | default: 'Buy Now'
+  assign product_preorder_enabled_value = product.metafields.custom.preorder_enabled.value
+  assign product_preorder_enabled_string = product_preorder_enabled_value | append: '' | downcase
+  assign variant_preorder_enabled_value = current_variant.metafields.custom.preorder_enabled.value
+  assign variant_preorder_enabled_string = variant_preorder_enabled_value | append: '' | downcase
+
+  if product_preorder_enabled_value == true or product_preorder_enabled_string == 'true' or product_preorder_enabled_string == 'yes' or variant_preorder_enabled_value == true or variant_preorder_enabled_string == 'true' or variant_preorder_enabled_string == 'yes'
+    assign button_text = 'PRE ORDER NOW'
+  endif
+-%}
+
+<div
+  class="product__block product-block-buy-now product__block--medium"
+  {{ block.shopify_attributes }}
+  data-buy-now-block
+  data-section-id="{{ section.id }}"
+>
+  <button
+    type="button"
+    class="product-block-buy-now__button btn btn--medium btn--full"
+    data-buy-now-button
+    {% unless current_variant.available %}
+      aria-disabled="true" disabled
+    {% endunless %}
+  >
+    <span data-buy-now-text>{{ button_text }}</span>
+    <div class="btn__loading-wrap">
+      <div class="btn__loading-bar"></div>
+    </div>
+  </button>
+  <p class="product-block-buy-now__error fs-body-50 hidden" data-buy-now-error></p>
+</div>
+
+<script>
+  (function() {
+    var block = document.querySelector('[data-buy-now-block][data-section-id="{{ section.id }}"]');
+    if (!block || block._buyNowInit) return;
+    block._buyNowInit = true;
+
+    var button = block.querySelector('[data-buy-now-button]');
+    var error = block.querySelector('[data-buy-now-error]');
+    var productSection = block.closest('[data-section-type="product"]') || document;
+    var form = productSection.querySelector('.product-form-{{ section.id }}');
+    var addToCartButton = productSection.querySelector('[data-add-to-cart]');
+
+    function showError(message) {
+      if (!error) return;
+      error.textContent = message;
+      error.classList.remove('hidden');
+    }
+
+    function hideError() {
+      if (!error) return;
+      error.textContent = '';
+      error.classList.add('hidden');
+    }
+
+    function getVariantId() {
+      if (!form) return '';
+      var variantSelect = form.querySelector('[name="id"]');
+      return variantSelect ? variantSelect.value : '';
+    }
+
+    function getQuantity() {
+      if (!form) return 1;
+      var quantityInput = form.querySelector('[name="quantity"]');
+      var quantity = quantityInput ? parseInt(quantityInput.value, 10) : 1;
+      return quantity > 0 ? quantity : 1;
+    }
+
+    function getProperties() {
+      var properties = {};
+      productSection.querySelectorAll('[name^="properties["]').forEach(function(input) {
+        if (input.disabled || input.value === '') return;
+        if ((input.type === 'checkbox' || input.type === 'radio') && !input.checked) return;
+
+        var match = input.name.match(/^properties\[(.+)\]$/);
+        if (match && match[1]) {
+          properties[match[1]] = input.value;
+        }
+      });
+      return properties;
+    }
+
+    function isCurrentPreorder() {
+      var preorderMarker = productSection.querySelector('[name="properties[_preorder]"]');
+      return !!preorderMarker && !preorderMarker.disabled && preorderMarker.value === 'true';
+    }
+
+    function syncPreorderOrderAttribute() {
+      if (!isCurrentPreorder()) return Promise.resolve();
+
+      return fetch((window.theme.routes.cart.update || '/cart/update') + '.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({
+          attributes: {
+            'Pre-order order': 'Yes'
+          }
+        })
+      }).then(function(response) {
+        if (!response.ok) throw new Error('Could not mark this order as pre-order.');
+        return response.json();
+      });
+    }
+
+    if (!button) return;
+
+    function placeAfter(anchor, element) {
+      if (!anchor || !element || anchor.nextElementSibling === element) return;
+      anchor.insertAdjacentElement('afterend', element);
+    }
+
+    function positionAfterBuyNow() {
+      var anchor = block;
+      var shopPayTerms = productSection.querySelector('.product-form__shop-pay');
+      var stockIndicator = productSection.querySelector('[data-inventory-counter]');
+
+      if (stockIndicator && stockIndicator !== block) {
+        block.classList.add('product-block-buy-now--has-stock-after');
+        stockIndicator.classList.add('inventory-counter--after-buy-now');
+        placeAfter(anchor, stockIndicator);
+        anchor = stockIndicator;
+      }
+
+      if (shopPayTerms) {
+        shopPayTerms.classList.add('product-form__shop-pay--after-buy-now');
+        placeAfter(anchor, shopPayTerms);
+      }
+    }
+
+    positionAfterBuyNow();
+    window.setTimeout(positionAfterBuyNow, 150);
+    window.setTimeout(positionAfterBuyNow, 600);
+    window.setTimeout(positionAfterBuyNow, 1200);
+
+    if (productSection !== document) {
+      new MutationObserver(positionAfterBuyNow).observe(productSection, {
+        childList: true,
+        subtree: true
+      });
+    }
+
+    function syncAvailability() {
+      if (!addToCartButton) return;
+      var unavailable = addToCartButton.disabled || addToCartButton.getAttribute('aria-disabled') === 'true';
+      button.disabled = unavailable;
+      button.setAttribute('aria-disabled', unavailable ? 'true' : 'false');
+    }
+
+    if (addToCartButton) {
+      syncAvailability();
+      new MutationObserver(syncAvailability).observe(addToCartButton, {
+        attributes: true,
+        attributeFilter: ['disabled', 'aria-disabled']
+      });
+    }
+
+    button.addEventListener('click', function() {
+      if (button.disabled || button.getAttribute('aria-disabled') === 'true') return;
+      hideError();
+
+      var variantId = getVariantId();
+      if (!variantId) {
+        showError('Please select an available option.');
+        return;
+      }
+
+      var buttonText = button.querySelector('[data-buy-now-text]');
+      var restoreText = buttonText ? buttonText.textContent : '';
+      button.disabled = true;
+      button.classList.add('btn--loading');
+
+      fetch(window.theme.routes.cart.add + '.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({
+          id: Number(variantId),
+          quantity: getQuantity(),
+          properties: getProperties()
+        })
+      })
+        .then(function(response) {
+          return response.json().then(function(data) {
+            if (!response.ok || data.status) throw new Error(data.description || 'Could not start checkout.');
+            return data;
+          });
+        })
+        .then(function() {
+          return syncPreorderOrderAttribute();
+        })
+        .then(function() {
+          window.location.href = '/checkout';
+        })
+        .catch(function(err) {
+          button.disabled = false;
+          button.classList.remove('btn--loading');
+          if (restoreText && buttonText) buttonText.textContent = restoreText;
+          showError(err.message || 'Could not start checkout. Please try again.');
+        });
+    });
+  })();
+</script>
