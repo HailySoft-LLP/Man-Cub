@@ -43,6 +43,7 @@
           >
             <div class="quick-cart__items animation--quick-cart-items">
               {%- render 'free-shipping-bar' %}
+              {%- render 'cart-free-cap-progress' %}
 
               {%- assign rendered_bundle_ids_qc = '' -%}
               {%- for item in cart.items -%}
@@ -51,6 +52,14 @@
                 {%- assign item_is_preorder = false -%}
                 {%- if item.properties['_preorder'] == 'true' or item.properties['Pre-order'] != blank -%}
                   {%- assign item_is_preorder = true -%}
+                {%- endif -%}
+                {%- assign item_is_auto_free_cap = false -%}
+                {%- if item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true' -%}
+                  {%- assign item_is_auto_free_cap = true -%}
+                {%- endif -%}
+                {%- assign item_is_free_cap_display = item_is_auto_free_cap -%}
+                {%- if item.product.handle == 'cap-man-size' and item.final_line_price == 0 -%}
+                  {%- assign item_is_free_cap_display = true -%}
                 {%- endif -%}
 
                 {%- if item_bundle_id != blank -%}
@@ -117,7 +126,9 @@
                           assign item_price = item.original_price
                           assign item_sale_price = blank
                           assign price_tag_type = 'span'
-                          if item.original_line_price > item.final_line_price or item.variant.compare_at_price > item.variant.price
+                          if item_is_free_cap_display
+                            assign item_price = 0
+                          elsif item.original_line_price > item.final_line_price or item.variant.compare_at_price > item.variant.price
                             assign price_tag_type = 's'
                             if item.original_line_price > item.final_line_price
                               assign item_sale_price = item.final_price
@@ -149,7 +160,7 @@
                             <span class="quick-cart__item-price">{{ 'products.inventory.zero_price_custom_label' | t }}</span>
                           </div>
                         {% endif %}
-                        {% if item.line_level_discount_allocations.size > 0 %}
+                        {% if item.line_level_discount_allocations.size > 0 and item_is_free_cap_display == false %}
                           <ul class="quick-cart__item-discounts">
                             {% for discount_allocation in item.line_level_discount_allocations %}
                               <li class="quick-cart__item-discount fs-body-60">
@@ -266,6 +277,7 @@
             <h3 class="quick-cart__empty-state-heading ff-heading fs-heading fs-heading-4-base">
               {{ 'cart.general.empty' | t }}
             </h3>
+            {%- render 'cart-free-cap-progress' %}
             {%- if section.settings.collection_list != blank -%}
               {%- if section.settings.promotion_text != blank -%}
                 <div class="quick-cart__empty-state-promot-text rte ff-body fs-body-100">

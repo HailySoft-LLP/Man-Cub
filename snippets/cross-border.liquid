@@ -90,8 +90,10 @@
               data-disclosure-toggle
             >
               <span class="flag-icon flag-icon-{{ localization.country.iso_code | handleize }}"></span>
-              {{ localization.country.name }} ({{ localization.country.currency.iso_code }}
-              {{ localization.country.currency.symbol }})
+              <span class="disclosure__toggle-label">
+                {{ localization.country.name }} ({{ localization.country.currency.iso_code }}
+                {{ localization.country.currency.symbol }})
+              </span>
               {% render 'icon', icon: 'chevron-small' %}
             </button>
             <ul
@@ -127,6 +129,22 @@
                 
                 {% endif %}
               {%- endfor -%}
+              <li class="disclosure-list__item{% unless allowed_countries contains localization.country.iso_code %} disclosure-list__item--current{% endunless %}">
+                <a
+                  class="disclosure-list__option no-transition fs-body-75"
+                  href="#"
+                  {% unless allowed_countries contains localization.country.iso_code %}
+                    aria-current="true"
+                  {% endunless %}
+                  data-value="US"
+                  data-disclosure-option
+                  data-rest-of-world="true"
+                >
+                  {% render 'icon', icon: 'globe', class: 'disclosure-list__globe-icon' %}
+                  <span class="disclosure-list__option-label">Rest of World <span class="disclosure__currency">(USD $)</span></span>
+                  {% render 'icon', icon: 'checkmark', class: 'disclosure-list__checkmark-icon' %}
+                </a>
+              </li>
             </ul>
             <input
               type="hidden"

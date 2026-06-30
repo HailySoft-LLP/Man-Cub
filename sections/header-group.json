@@ -22,10 +22,10 @@
             "link": ""
           }
         },
-        "announcement_HW3c9q": {
+        "announcement_yNepDA": {
           "type": "announcement",
           "settings": {
-            "title": "<p>Shop for Father's Day 21st June</p>",
+            "title": "<p>Free MAN Cap with orders over £150 / $200</p>",
             "title_mobile": "",
             "link": ""
           }
@@ -33,7 +33,7 @@
       },
       "block_order": [
         "announcement-bar-1",
-        "announcement_HW3c9q"
+        "announcement_yNepDA"
       ],
       "settings": {
         "enable_sticky_announcement_bar": "desktop-and-mobile",

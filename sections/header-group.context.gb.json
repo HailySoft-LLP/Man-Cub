@@ -16,20 +16,24 @@
     "announcement-bar": {
       "settings": {},
       "blocks": {
-        "announcement_rXNBH": {
-          "type": "announcement",
-          "disabled": false,
+        "announcement-bar-1": {
           "settings": {
-            "title": "<p>Free shipping on orders over |amount|</p>",
-            "title_mobile": "<p>Free shipping on orders over |amount|</p>",
+            "title": "<p>MANCUB</p>",
+            "title_mobile": "",
+            "link": ""
+          }
+        },
+        "announcement_yNepDA": {
+          "settings": {
+            "title": "<p>Free MAN Cap with orders over £150 / $200</p>",
+            "title_mobile": "<p>Free MAN Cap with orders over £150 / $200</p>",
             "link": ""
           }
         }
       },
       "block_order": [
-        "announcement_rXNBH",
         "announcement-bar-1",
-        "announcement_HW3c9q"
+        "announcement_yNepDA"
       ]
     }
   }

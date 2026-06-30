@@ -30,6 +30,52 @@
   {% if section.settings.enable_sticky_header %}
     document.documentElement.classList.add("sticky-header-enabled");
   {% endif %}
+  /* Expose a small helper mapping of navbar countries -> currency and helper functions
+     - `navAllowedCountries` mirrors the drawer-menu allowed list
+     - `countryCurrencyMap` maps iso country -> currency iso
+     - `getDisplayedCurrencyCode()` returns currency iso for selected country or 'USD' fallback
+     - `getDisplayedCurrencyRate()` returns a numeric rate using Shopify rates when available
+  */
+  window.theme = window.theme || {};
+  (function() {
+    var navAllowedCountries = ["GB","US","FR","DE","ES","IT","NL","AU","AE","CA","BB"];
+    var countryCurrencyMap = {
+      {% for c in localization.available_countries %}
+        "{{ c.iso_code }}": "{{ c.currency.iso_code }}"{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    };
+    window.theme.navAllowedCountries = navAllowedCountries;
+    window.theme.countryCurrencyMap = countryCurrencyMap;
+    window.theme.defaultFallbackCurrency = 'USD';
+
+    window.theme.getDisplayedCountry = function() {
+      var el = document.querySelector('[data-currency-input]') || document.getElementById('CurrencySelector');
+      return (el && el.value) ? el.value : '{{ localization.country.iso_code }}';
+    };
+
+    window.theme.getDisplayedCurrencyCode = function() {
+      try {
+        var country = window.theme.getDisplayedCountry();
+        if (window.theme.navAllowedCountries.indexOf(country) !== -1) {
+          return window.theme.countryCurrencyMap[country] || '{{ localization.country.currency.iso_code }}';
+        }
+        return window.theme.defaultFallbackCurrency;
+      } catch (e) { return '{{ localization.country.currency.iso_code }}'; }
+    };
+
+    window.theme.getDisplayedCurrencyRate = function() {
+      var code = window.theme.getDisplayedCurrencyCode();
+      try {
+        if (window.Shopify && window.Shopify.currency && window.Shopify.currency.rates && window.Shopify.currency.rates[code]) {
+          return parseFloat(window.Shopify.currency.rates[code]);
+        }
+        if (window.Shopify && window.Shopify.currency && window.Shopify.currency.rate) {
+          return parseFloat(window.Shopify.currency.rate);
+        }
+      } catch (e) {}
+      return 1;
+    };
+  })();
   {% if transparent_header_enabled %}
     document.body.classList.add("header-transparent");
   {% endif %}

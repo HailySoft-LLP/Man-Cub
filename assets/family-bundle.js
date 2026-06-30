@@ -11,6 +11,7 @@ window._familyBundleLoaded = true;
   var moneyFormat = window.theme.moneyFormat || '{{amount}}';
 
   function formatMoney(cents) {
+    cents = Math.round(cents || 0);
     var amt = (cents / 100).toFixed(2);
     var n = Math.floor(cents / 100);
     return moneyFormat
@@ -231,49 +232,85 @@ window._familyBundleLoaded = true;
         var toggle = m.querySelector('[data-bundle-toggle]');
         if (toggle && !toggle.checked) return;
         var memberTotal = 0;
-        var memberSaleTotal = 0;
+        var headerVariant = null; /* Separate variant for header/primary selection */
         var rows = m.querySelectorAll('.family-bundle__option-row');
+        
         if (rows.length === 0) {
-          var variant = getSelectedVariant(m);
+          /* No size options — single variant */
+          headerVariant = getSelectedVariant(m);
           var qty = parseInt((m.querySelector('[data-bundle-qty]') || { value: 1 }).value) || 1;
-          if (variant) memberTotal += variant.price * qty;
-          memberSaleTotal = variant.compare_at_price;
+          if (headerVariant) memberTotal += headerVariant.price * qty;
         } else {
+          /* Multiple size options — process each row */
           rows.forEach(function(row) {
-            var variant = getSelectedVariantFromRow(m, row);
-            console.log("variant::", variant);
+            var rowVariant = getSelectedVariantFromRow(m, row);
             var qtyInput = row.querySelector('[data-bundle-qty]');
             var qty = parseInt((qtyInput || { value: 1 }).value) || 1;
-            var rowPrice = variant ? variant.price * qty : 0;
-            memberSaleTotal = variant ? variant.compare_at_price : 0;
+            var rowPrice = rowVariant ? rowVariant.price * qty : 0;
             
-            /* Check if this row is inside a clone section */
+            /* Update clone section price if exists */
             var cloneSection = row.closest('.family-bundle__additional-section');
             if (cloneSection) {
               var clonePriceEl = cloneSection.querySelector('[data-bundle-clone-price]');
               if (clonePriceEl) clonePriceEl.textContent = formatMoney(rowPrice);
+              
+              /* Update clone compare price only if there's a discount */
+              var cloneCompareEl = cloneSection.querySelector('[data-bundle-member-sale-price]');
+              if (cloneCompareEl && rowVariant) {
+                if (rowVariant.compare_at_price && rowVariant.compare_at_price > rowVariant.price) {
+                  cloneCompareEl.textContent = formatMoney(rowVariant.compare_at_price);
+                  cloneCompareEl.style.display = '';
+                } else {
+                  cloneCompareEl.style.display = 'none';
+                }
+              }
             }
             memberTotal += rowPrice;
           });
+          /* Get header variant from the first option row */
+          var firstRow = rows[0];
+          if (firstRow) {
+            headerVariant = getSelectedVariantFromRow(m, firstRow);
+          }
         }
         total += memberTotal;
-        /* Update the original member header price (not clone prices) */
-        var headerPrice = m.querySelector(':scope > .family-bundle__member-header [data-bundle-member-price]');
-        if (headerPrice) headerPrice.textContent = formatMoney(memberTotal);
         
-        m.querySelectorAll('.family-bundle__member-header [data-bundle-member-sale-price]').forEach(function(el){
-          if (el) el.textContent = formatMoney(memberSaleTotal);
-        })
+                /* Intentionally do NOT update member header prices here.
+           Member prices (Cub/Man/Girl/etc) should remain the static Liquid-rendered values.
+           Only the bundle total updates dynamically. */
+        
+        var headerPrice = m.querySelector(':scope > .family-bundle__member-header [data-bundle-member-price]');
+        /*
+        var headerSaleEl = m.querySelector(':scope > .family-bundle__member-header [data-bundle-member-sale-price]');
+        */
+        
+        /* Update header compare price only if there's an actual discount */
 
+        
+        /* Update header compare price only if there's an actual discount */
+        var headerSaleEl = m.querySelector(':scope > .family-bundle__member-header [data-bundle-member-sale-price]');
+        if (headerSaleEl && headerVariant) {
+          if (headerVariant.compare_at_price && headerVariant.compare_at_price > headerVariant.price) {
+            headerSaleEl.textContent = formatMoney(headerVariant.compare_at_price);
+            headerSaleEl.style.display = '';
+          } else {
+            headerSaleEl.style.display = 'none';
+          }
+        }
       });
-      if (totalPriceEl) totalPriceEl.textContent = formatMoney(total);
-      syncStickyBarPrice(total);
+        if (totalPriceEl) {
+        // Hide default 0.00 until user selects sizes
+        if (!total || total <= 0) {
+          totalPriceEl.textContent = '';
+        } else {
+          totalPriceEl.textContent = formatMoney(total);
+        }
+      }      syncStickyBarPrice(total);
     }
 
 
     // Chip & qty events
     bundle.addEventListener('click', function(e) {
-      console.log("CLICK AFTER ADDED ADDITIONAL");
       if (
         e.target.closest('[data-bundle-chip]') ||
         e.target.closest('[data-bundle-add-another]') ||
@@ -385,7 +422,7 @@ window._familyBundleLoaded = true;
       header.innerHTML = '<div class="family-bundle__member-info">' +
         '<span class="family-bundle__member-label fs-body-75">ADDITIONAL ' + labelText + '</span>' +
         '</div>' +
-        '<span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price></span>' +
+        '<span class="family-bundle__member-sale-price sale fs-body-100" data-bundle-member-sale-price style="display:none;"></span>' +
         '<span class="family-bundle__member-price fs-body-100" data-bundle-clone-price>£0.00</span>' +
         '<div class="family-bundle__member-actions">' +
         '<button type="button" class="family-bundle__row-remove" data-bundle-remove-row>REMOVE</button>' +
@@ -401,9 +438,8 @@ window._familyBundleLoaded = true;
 
       var cloneChips = rowClone.querySelector('[data-bundle-chips]');
       if (cloneChips) {
-        /* Auto-select first available size */
-        var firstAvail = cloneChips.querySelector('[data-available="true"]');
-        if (firstAvail) firstAvail.classList.add('selected');
+        /* Keep cloned row unselected by default so it doesn't override header selection */
+        cloneChips.querySelectorAll('.selected').forEach(function(c) { c.classList.remove('selected'); });
       }
 
       section.appendChild(rowClone);

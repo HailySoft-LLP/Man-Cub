@@ -51,14 +51,14 @@
     "swatch_image_fit": "cover",
     "color_text_sale_badge": "#d21404",
     "sale_badge_format": "sale_text",
-    "custom_product_badge_group_1_tag_names": "Test",
-    "custom_product_badge_group_1_color": "#74c794",
-    "custom_product_badge_group_2_tag_names": "Best Seller",
-    "custom_product_badge_group_2_color": "#58c3ff",
+    "custom_product_badge_group_1_tag_names": "Last Pieces Remaining",
+    "custom_product_badge_group_1_color": "#000000",
+    "custom_product_badge_group_2_tag_names": "Best Seller, Back In Stock",
+    "custom_product_badge_group_2_color": "#000000",
     "custom_product_badge_group_3_tag_names": "New In, Popular",
     "custom_product_badge_group_3_color": "#000000",
-    "custom_product_badge_group_4_tag_names": "",
-    "custom_product_badge_group_4_color": "#df0a0a",
+    "custom_product_badge_group_4_tag_names": "Almost gone, Clearance, Sale",
+    "custom_product_badge_group_4_color": "#000000",
     "uppercase_badges": true,
     "product_listing_show_vendor": false,
     "enable_border_on_hover": false,
@@ -104,6 +104,11 @@
       },
       "144831480468751239": {
         "type": "shopify://apps/essential-upsell/blocks/app-embed/50627fd9-24fd-4250-8614-accc12826d80",
+        "disabled": false,
+        "settings": {}
+      },
+      "7280966411886983154": {
+        "type": "shopify://apps/monk/blocks/app-embed/e949adb6-87ca-4b97-8f31-0e51bf507f2d",
         "disabled": false,
         "settings": {}
       }

@@ -25,6 +25,14 @@
             {%- if item.properties['_preorder'] == 'true' or item.properties['Pre-order'] != blank -%}
               {%- assign item_is_preorder = true -%}
             {%- endif -%}
+            {%- assign item_is_auto_free_cap = false -%}
+            {%- if item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true' -%}
+              {%- assign item_is_auto_free_cap = true -%}
+            {%- endif -%}
+            {%- assign item_is_free_cap_display = item_is_auto_free_cap -%}
+            {%- if item.product.handle == 'cap-man-size' and item.final_line_price == 0 -%}
+              {%- assign item_is_free_cap_display = true -%}
+            {%- endif -%}
 
             {%- if item_bundle_id != blank -%}
               {%- comment -%} BUNDLE ITEM — check if we already rendered this bundle {%- endcomment -%}
@@ -96,7 +104,7 @@
                         </div>
                       {% endif %}
 
-                      {% if item.line_level_discount_allocations.size > 0 %}
+                      {% if item.line_level_discount_allocations.size > 0 and item_is_free_cap_display == false %}
                         <ul class="cart__form-item-discounts">
                           {% for discount_allocation in item.line_level_discount_allocations %}
                             <li class="cart__form-item-discount fs-body-75">
@@ -118,7 +126,9 @@
                       assign item_price = item.original_price
                       assign item_sale_price = blank
                       assign price_tag_type = 'span'
-                      if item.original_line_price > item.final_line_price or item.variant.compare_at_price > item.variant.price
+                      if item_is_free_cap_display
+                        assign item_price = 0
+                      elsif item.original_line_price > item.final_line_price or item.variant.compare_at_price > item.variant.price
                         assign price_tag_type = 's'
                         if item.original_line_price > item.final_line_price
                           assign item_sale_price = item.final_price
@@ -229,6 +239,8 @@
                 class="cart__footer-subtotal-wrapper {% if  cart.cart_level_discount_applications.size > 0 %}cart__footer-subtotal-wrapper--has-discount{% endif %}"
                 js-cart-footer-subtotal-wrapper
               >
+                {%- render 'cart-free-cap-progress' %}
+
                 {%- if cart.cart_level_discount_applications.size > 0 -%}
                   <ul class="cart__item-discounts">
                     {% for discount_application in cart.cart_level_discount_applications %}
@@ -304,6 +316,7 @@
         <div class="cart__empty-message supports-cookies">
           <h1 class="cart__empty-message-heading ff-heading fs-heading-2-base">{{ 'cart.general.empty' | t }}</h1>
           <p class="cart__empty-message-text fs-body-100">{{ 'cart.general.empty_message' | t }}</p>
+          {%- render 'cart-free-cap-progress' %}
           {%- if section.settings.collection_list != blank -%}
             {%- if section.settings.promotion_text != blank -%}
               <div class="cart__empty-state-promot-text rte ff-body fs-body-100">

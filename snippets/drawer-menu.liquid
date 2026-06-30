@@ -151,9 +151,9 @@
                   <a class="drawer-menu__link fs-body-50" href="#" data-item="viewCurrency">
                     <span class="flag-icon flag-icon-{{ localization.country.iso_code | handleize }}"></span>
                     <span class="drawer-menu__link--label">
-                      {{- localization.country.name }} ({{ localization.country.currency.iso_code }}
-                      {{ localization.country.currency.symbol }})</span
-                    >
+                      <span class="drawer-menu__currency-label">{{- localization.country.name }} ({{ localization.country.currency.iso_code }}
+                      {{ localization.country.currency.symbol }})</span>
+                    </span>
                   </a>
                   <ul class="drawer-menu__list drawer-menu__list--sub drawer-menu__list--country-selector">
                     <li class="drawer-menu__item drawer-menu__item--heading">
@@ -191,6 +191,19 @@
                        </li>
                       {% endif%}
                     {%- endfor -%}
+                    <li class="drawer-menu__item localization-item" data-list-item>
+                      <a
+                        class="drawer-menu__link drawer-menu__link--cb"
+                        href="#"
+                        data-item="currency"
+                        data-value="US"
+                        data-rest-of-world="true"
+                      >
+                        {% render 'icon', icon: 'globe', class: 'drawer-menu__globe-icon' %}
+                        <span class="drawer-menu__link--label">Rest of World <span class="drawer-menu__currency">(USD $)</span></span>
+                        {% render 'icon', icon: 'checkmark', class: 'drawer-menu__checkmark-icon' %}
+                      </a>
+                    </li>
                   </ul>
 
                 </li>

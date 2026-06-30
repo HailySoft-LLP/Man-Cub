@@ -1,69 +1,304 @@
-// Custom events have been added to the theme to make adding
-// custom functionality easier. The below events have been
-// exposed as well as the associated data for each event.
-// To enable this functionality update the 'useCustomEvents' variable in
-// the theme.liquid file to 'true'.
+(function () {
+  if (window.MCAutoFreeCapLoaded) return;
+  window.MCAutoFreeCapLoaded = true;
 
-// This event fires whenever an item has been added to the cart.
-// This event is exposed when the ajax cart is enabled.
-// The product object is passed within the detail object.
-document.addEventListener("cart:item-added", function (evt) {
-  console.log("Item added to the cart");
-  console.log(evt.detail.product);
-});
+  var config = window.theme && window.theme.autoFreeCap ? window.theme.autoFreeCap : {};
+  var BASE_THRESHOLD_CENTS = Number(config.thresholdCents) || 15000;
+  var THRESHOLDS_BY_CURRENCY = config.thresholdsByCurrency || {
+    GBP: 15000,
+    USD: 20000,
+    EUR: 17500,
+    CAD: 30000,
+    AED: 75000
+  };
+  var GIFT_PRODUCT_HANDLE = config.productHandle || 'cap-man-size';
+  var GIFT_SEARCH_TERM = 'Cap - Man Size';
+  var GIFT_PROPERTY_NAME = config.propertyName || '_auto_free_cap';
+  var LEGACY_GIFT_PROPERTY_NAME = config.legacyPropertyName || '_cart_free_gift';
+  var GIFT_PROPERTY_VALUE = 'true';
 
-// This event fires whenever the cart is updated.
-// This event is exposed when the ajax cart is enabled.
-// The cart object is passed within the detail object.
-document.addEventListener("cart:updated", function (evt) {
-  console.log("Cart updated");
-  console.log(evt.detail.cart);
-});
+  var routes = (window.theme && window.theme.routes && window.theme.routes.cart) || {};
+  var themeRoutes = (window.theme && window.theme.routes) || {};
+  var isSyncing = false;
+  var pendingSync = false;
+  var giftVariantPromise = null;
 
-// This event fires whenever there is an error when adding an item to the cart.
-// This error is typically due to a product not having sufficient stock.
-// The error message is passed within the detail object.
-document.addEventListener("cart:error", function (evt) {
-  console.log("Cart error");
-  console.log(evt.detail.errorMessage);
-});
+  function jsonRoute(route) {
+    return route.slice(-3) === '.js' ? route : route + '.js';
+  }
 
-// This event fires whenever the quick cart is opened.
-// This event is exposed when the ajax cart is enabled.
-// The cart object is passed within the detail object.
-document.addEventListener("quick-cart:open", function (evt) {
-  console.log("Quick cart opened");
-  console.log(evt.detail.cart);
-});
+  function cartRoute(key, fallback) {
+    return jsonRoute(routes[key] || fallback);
+  }
 
-// This event fires whenever the quick cart is opened.
-// This event is exposed when the ajax cart is enabled.
-document.addEventListener("quick-cart:close", function () {
-  console.log("Quick cart closed");
-});
+  function fetchCart() {
+    return fetch(cartRoute('base', '/cart'), {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (response) {
+      return response.json();
+    });
+  }
 
-// This event fires whenever a variant product is selected.
-// This event is exposed when a 'Variant selectors' block has been added to
-// a product template or featured product section
-// The selected variant object is passed within the detail object.
-document.addEventListener("product:variant-change", function (evt) {
-  console.log("Product variant changed");
-  console.log(evt.detail.variant);
-});
+  function changeCart(payload) {
+    return fetch(cartRoute('change', '/cart/change'), {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (response) {
+      return response.json();
+    });
+  }
 
-// This event fires whenever a product quanatiy is updated.
-// This event is exposed when a 'Quantity selector' block has been added to
-// a product template or featured product section
-// The quantity and selected variant object is passed within the detail object.
-document.addEventListener("product:quantity-update", function (evt) {
-  console.log("Product quantity updated");
-  console.log(evt.detail.quantity, evt.detail.variant);
-});
+  function addGift(variantId) {
+    var properties = {};
+    properties[GIFT_PROPERTY_NAME] = GIFT_PROPERTY_VALUE;
 
-// This event fires whenever quickview modal is opened.
-// This event is exposed when the 'Enable quick view' feature is enabled
-// And a quick view modal is opened.
-document.addEventListener("quickview:loaded", function () {
-  console.log("Quickview loaded");
-});
+    return fetch(cartRoute('add', '/cart/add'), {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: [{
+          id: Number(variantId),
+          quantity: 1,
+          properties: properties
+        }]
+      })
+    }).then(function (response) {
+      return response.json();
+    });
+  }
 
+  function activeCurrency() {
+    if (window.theme && typeof window.theme.getDisplayedCurrencyCode === 'function') {
+      try { return String(window.theme.getDisplayedCurrencyCode()).toUpperCase(); } catch (e) {}
+    }
+    var shopifyCurrency = window.Shopify && window.Shopify.currency;
+    var currency = (shopifyCurrency && shopifyCurrency.active) || config.currentCurrency || 'GBP';
+    return String(currency).toUpperCase();
+  }
+
+  function activeThresholdCents() {
+    var currency = activeCurrency();
+    if (THRESHOLDS_BY_CURRENCY[currency]) return THRESHOLDS_BY_CURRENCY[currency];
+
+    var marketRate = 1;
+    if (window.theme && typeof window.theme.getDisplayedCurrencyRate === 'function') {
+      marketRate = parseFloat(window.theme.getDisplayedCurrencyRate()) || 1;
+    } else {
+      var rate = window.Shopify && window.Shopify.currency && window.Shopify.currency.rate;
+      var parsedRate = parseFloat(rate);
+      marketRate = Number.isFinite(parsedRate) && parsedRate > 0 ? parsedRate : 1;
+    }
+
+    return Math.round(BASE_THRESHOLD_CENTS * marketRate);
+  }
+
+  function isAutoGiftItem(item, variantId) {
+    var properties = item.properties || {};
+    return String(item.variant_id) === String(variantId)
+      && (
+        String(properties[GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE
+        || String(properties[LEGACY_GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE
+      );
+  }
+
+  function isGiftVariant(item, variantId) {
+    return String(item.variant_id) === String(variantId);
+  }
+
+  function qualifyingSubtotal(cart, variantId) {
+    return (cart.items || []).reduce(function (total, item) {
+      if (isAutoGiftItem(item, variantId)) return total;
+
+      var linePrice = typeof item.final_line_price === 'number'
+        ? item.final_line_price
+        : item.line_price;
+
+      return total + (Number(linePrice) || 0);
+    }, 0);
+  }
+
+  function productUrl(handle) {
+    var productsBase = themeRoutes.products || '/products';
+    return productsBase.replace(/\/$/, '') + '/' + handle + '.js';
+  }
+
+  function firstAvailableVariantId(product) {
+    var variants = product && product.variants ? product.variants : [];
+    var availableVariant = variants.find(function (variant) {
+      return variant.available;
+    });
+
+    return (availableVariant || variants[0] || {}).id || null;
+  }
+
+  function fetchProductVariant(handle) {
+    return fetch(productUrl(handle), {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Gift product not found');
+      return response.json();
+    }).then(firstAvailableVariantId);
+  }
+
+  function searchGiftVariant() {
+    var searchUrl = themeRoutes.predictive_search_url || '/search/suggest';
+
+    return fetch(searchUrl + '.json?q=' + encodeURIComponent(GIFT_SEARCH_TERM) + '&resources[type]=product&resources[limit]=5', {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Gift product search failed');
+      return response.json();
+    }).then(function (data) {
+      var products = (((data || {}).resources || {}).results || {}).products || [];
+      var product = products.find(function (item) {
+        return String(item.title || '').toLowerCase() === GIFT_SEARCH_TERM.toLowerCase();
+      }) || products[0];
+      var match = product && product.url ? product.url.match(/\/products\/([^/?#]+)/) : null;
+
+      return match ? fetchProductVariant(match[1]) : null;
+    });
+  }
+
+  function giftVariantId() {
+    if (window.MCAutoFreeCap && window.MCAutoFreeCap.variantId) {
+      return Promise.resolve(window.MCAutoFreeCap.variantId);
+    }
+
+    if (config.variantId) return Promise.resolve(config.variantId);
+    if (giftVariantPromise) return giftVariantPromise;
+
+    giftVariantPromise = fetchProductVariant(GIFT_PRODUCT_HANDLE)
+      .catch(searchGiftVariant)
+      .then(function (variantId) {
+        return variantId || null;
+      });
+
+    return giftVariantPromise;
+  }
+
+  function refreshCartPage() {
+    var cartSection = document.querySelector('[data-section-type="cart"]');
+    if (!cartSection || !cartSection.dataset.sectionId || !routes.base) return Promise.resolve();
+
+    return fetch(routes.base + '?section_id=' + cartSection.dataset.sectionId)
+      .then(function (response) {
+        return response.text();
+      })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var sourceCart = doc.querySelector('[data-section-type="cart"]');
+
+        if (sourceCart) cartSection.innerHTML = sourceCart.innerHTML;
+      })
+      .catch(function () {});
+  }
+
+  function dispatchCartRefresh(cart) {
+    document.dispatchEvent(new CustomEvent('apps:product-added-to-cart', {
+      detail: {
+        cart: cart,
+        source: 'auto-free-cap'
+      }
+    }));
+
+    document.dispatchEvent(new CustomEvent('cart:updated', {
+      detail: {
+        cart: cart,
+        source: 'auto-free-cap'
+      }
+    }));
+
+    refreshCartPage();
+  }
+
+  function afterCartMutation() {
+    return fetchCart().then(function (cart) {
+      dispatchCartRefresh(cart);
+      return cart;
+    });
+  }
+
+  function syncCart(cart) {
+    if (isSyncing) {
+      pendingSync = true;
+      return;
+    }
+
+    isSyncing = true;
+
+    Promise.all([Promise.resolve(cart || fetchCart()), giftVariantId()])
+      .then(function (values) {
+        var currentCart = values[0];
+        var variantId = values[1];
+        if (!variantId) return currentCart;
+
+        var items = currentCart.items || [];
+        var autoGiftItems = items.filter(function (item) {
+          return isAutoGiftItem(item, variantId);
+        });
+        var customerGiftItem = items.find(function (item) {
+          return isGiftVariant(item, variantId) && !isAutoGiftItem(item, variantId);
+        });
+        var autoGiftItem = autoGiftItems[0];
+        var isEligible = qualifyingSubtotal(currentCart, variantId) >= activeThresholdCents();
+
+        if (isEligible && !autoGiftItem && !customerGiftItem) {
+          return addGift(variantId).then(afterCartMutation);
+        }
+
+        if (!isEligible && autoGiftItem) {
+          return changeCart({ id: autoGiftItem.key, quantity: 0 }).then(afterCartMutation);
+        }
+
+        if (isEligible && autoGiftItem && autoGiftItem.quantity !== 1) {
+          return changeCart({ id: autoGiftItem.key, quantity: 1 }).then(afterCartMutation);
+        }
+
+        if (autoGiftItems.length > 1) {
+          return changeCart({ id: autoGiftItems[1].key, quantity: 0 }).then(afterCartMutation);
+        }
+
+        return currentCart;
+      })
+      .catch(function () {})
+      .finally(function () {
+        isSyncing = false;
+
+        if (pendingSync) {
+          pendingSync = false;
+          fetchCart().then(syncCart);
+        }
+      });
+  }
+
+  document.addEventListener('cart:updated', function (event) {
+    if (event.detail && event.detail.source === 'auto-free-cap') return;
+    syncCart(event.detail && event.detail.cart);
+  });
+
+  document.addEventListener('apps:product-added-to-cart', function (event) {
+    if (event.detail && event.detail.source === 'auto-free-cap') return;
+    fetchCart().then(syncCart);
+  });
+
+  document.addEventListener('cart:update', function () {
+    fetchCart().then(syncCart);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      fetchCart().then(syncCart);
+    });
+  } else {
+    fetchCart().then(syncCart);
+  }
+})();

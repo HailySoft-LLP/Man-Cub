@@ -7951,6 +7951,7 @@ const menu = node => {
   // Every individual menu item
   const items = node.querySelectorAll(sel$3.item);
   items.forEach(item => item.addEventListener("click", handleItem));
+  updateRestOfWorldDisplay();
   function handleItem(e) {
     const {
       item
@@ -8096,8 +8097,10 @@ const menu = node => {
   }
   function handleCrossBorderChoice(e, input) {
     const {
-      value
+      value,
+      restOfWorld
     } = e.currentTarget.dataset;
+    setRestOfWorldPersisted(restOfWorld === 'true');
     input.value = value;
     close();
     form.submit();
@@ -8148,7 +8151,13 @@ function freeShippingBar(node) {
   cartTotal = parseInt(cartTotal, 10);
 
   // Account for different currencies using the Shopify currency rate
-  threshold = Math.round(parseInt(threshold, 10) * (window.Shopify.currency.rate || 1));
+  var _rate = 1;
+  if (window.theme && typeof window.theme.getDisplayedCurrencyRate === 'function') {
+    _rate = parseFloat(window.theme.getDisplayedCurrencyRate()) || 1;
+  } else if (window.Shopify && window.Shopify.currency && window.Shopify.currency.rate) {
+    _rate = parseFloat(window.Shopify.currency.rate) || 1;
+  }
+  threshold = Math.round(parseInt(threshold, 10) * _rate);
   const thresholdInCents = threshold * 100;
   _setProgressMessage();
   _setProgressBar();
@@ -8280,6 +8289,83 @@ const classes$d = {
   disclosureListRight: "disclosure-list--right",
   disclosureListTop: "disclosure-list--top"
 };
+const REST_OF_WORLD_STORAGE_KEY = 'selectedRestOfWorld';
+
+function getRestOfWorldCookie() {
+  return document.cookie.split('; ').reduce((value, cookie) => {
+    const [name, val] = cookie.split('=');
+    return name === REST_OF_WORLD_STORAGE_KEY ? val : value;
+  }, null);
+}
+
+function isRestOfWorldPersisted() {
+  try {
+    return window.localStorage.getItem(REST_OF_WORLD_STORAGE_KEY) === 'true';
+  } catch (error) {
+    return getRestOfWorldCookie() === 'true';
+  }
+}
+
+function setRestOfWorldCookie(value) {
+  if (value) {
+    document.cookie = "".concat(REST_OF_WORLD_STORAGE_KEY, "=true;path=/;max-age=31536000");
+  } else {
+    document.cookie = "".concat(REST_OF_WORLD_STORAGE_KEY, "=;path=/;max-age=0");
+  }
+}
+
+function setRestOfWorldPersisted(value) {
+  try {
+    if (value) {
+      window.localStorage.setItem(REST_OF_WORLD_STORAGE_KEY, 'true');
+    } else {
+      window.localStorage.removeItem(REST_OF_WORLD_STORAGE_KEY);
+    }
+  } catch (error) {
+    // ignore localStorage failures in private browsing modes
+  }
+  setRestOfWorldCookie(value);
+}
+
+function updateRestOfWorldDisplay() {
+  if (!isRestOfWorldPersisted()) return;
+
+  const currencyInput = document.querySelector('[name="country_code"], [data-currency-input]');
+  const currentCountry = currencyInput ? currencyInput.value : null;
+  if (currentCountry !== 'US') return;
+
+  const desktopToggle = document.querySelector('.disclosure__toggle--currency');
+  if (desktopToggle) {
+    const toggleLabel = desktopToggle.querySelector('.disclosure__toggle-label');
+    if (toggleLabel) {
+      toggleLabel.textContent = 'Rest of World (USD $)';
+    }
+  }
+
+  const drawerLabel = document.querySelector('.drawer-menu__currency-label');
+  if (drawerLabel) drawerLabel.textContent = 'Rest of World (USD $)';
+
+  const desktopRowOption = document.querySelector('[data-disclosure-option][data-rest-of-world="true"]');
+  const desktopUSOption = document.querySelector('[data-disclosure-option][data-value="US"]:not([data-rest-of-world])');
+  if (desktopRowOption && desktopUSOption) {
+    const desktopRowLi = desktopRowOption.closest('li');
+    const desktopUSLi = desktopUSOption.closest('li');
+    if (desktopRowLi) desktopRowLi.classList.add('disclosure-list__item--current');
+    if (desktopUSLi) desktopUSLi.classList.remove('disclosure-list__item--current');
+    desktopRowOption.setAttribute('aria-current', 'true');
+    desktopUSOption.removeAttribute('aria-current');
+  }
+
+  const drawerRowOption = document.querySelector('[data-item="currency"][data-rest-of-world="true"]');
+  const drawerUSOption = document.querySelector('[data-item="currency"][data-value="US"]:not([data-rest-of-world])');
+  if (drawerRowOption && drawerUSOption) {
+    const drawerRowLi = drawerRowOption.closest('li');
+    const drawerUSLi = drawerUSOption.closest('li');
+    if (drawerRowLi) drawerRowLi.classList.add('drawer-menu__item--current');
+    if (drawerUSLi) drawerUSLi.classList.remove('drawer-menu__item--current');
+  }
+}
+
 function has(list, selector) {
   return list.map(l => l.contains(selector)).filter(Boolean);
 }
@@ -8291,11 +8377,14 @@ function Disclosure(node) {
   const input = n$2(selectors$B.input, node);
   const options = t$2(selectors$B.option, node);
   const events = [e$2(toggle, "click", handleToggle), e$2(options, "click", submitForm), e$2(document, "click", handleBodyClick), e$2(toggle, "focusout", handleToggleFocusOut), e$2(list, "focusout", handleListFocusOut), e$2(node, "keyup", handleKeyup)];
+  updateRestOfWorldDisplay();
   function submitForm(evt) {
     evt.preventDefault();
     const {
-      value
+      value,
+      restOfWorld
     } = evt.currentTarget.dataset;
+    setRestOfWorldPersisted(restOfWorld === 'true');
     input.value = value;
     form.submit();
   }

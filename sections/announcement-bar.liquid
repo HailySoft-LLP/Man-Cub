@@ -125,10 +125,13 @@
     }
 
     function updateAnnouncementBarAmount() {
-      // window.Shopify.currency.rate is GBP → active currency (since shop base = GBP)
-      var rate = (window.Shopify && window.Shopify.currency && window.Shopify.currency.rate)
-        ? parseFloat(window.Shopify.currency.rate)
-        : 1;
+      // Use theme helper when available; fallback to Shopify currency rate
+      var rate = 1;
+      if (window.theme && typeof window.theme.getDisplayedCurrencyRate === 'function') {
+        rate = parseFloat(window.theme.getDisplayedCurrencyRate()) || 1;
+      } else if (window.Shopify && window.Shopify.currency && window.Shopify.currency.rate) {
+        rate = parseFloat(window.Shopify.currency.rate);
+      }
       document.querySelectorAll('.js-announcement-amount').forEach(function(span) {
         var baseCents = parseInt(span.getAttribute('data-base-cents'), 10);
         var converted = Math.round(baseCents * rate);

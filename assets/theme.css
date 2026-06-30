@@ -9941,6 +9941,44 @@ button.btn.video__pause{
     margin-right:calc(4px * 2);
     margin-right:var(--spacing-2);
   }
+.disclosure-list__option > .disclosure-list__globe-icon{
+    display:flex;
+    width:18px;
+    height:18px;
+    flex:1 0 18px;
+    max-width:18px;
+    margin-right:calc(4px * 2);
+    margin-right:var(--spacing-2);
+    margin-left:0;
+    align-items:center;
+    justify-content:center;
+  }
+.disclosure-list__option > .disclosure-list__globe-icon svg{
+    width:100%;
+    height:100%;
+  }
+/* ensure rendered icon component does not override size */
+.disclosure-list__option > .disclosure-list__globe-icon.icon,
+.drawer-menu__item.localization-item .drawer-menu__globe-icon.icon{
+  width:18px;
+  height:18px;
+  min-width:18px;
+}
+/* Override icon default that pushes icons to the right: force globe to act like flag */
+.disclosure-list__option > .icon.disclosure-list__globe-icon,
+.disclosure-list__option > .disclosure-list__globe-icon.icon{
+  margin-left:0 !important;
+  margin-right:var(--spacing-2) !important;
+  flex:1 0 18px !important;
+  max-width:18px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.disclosure-list__option .disclosure-list__option-label{
+  /* ensure label aligns consistently */
+  margin-left:0;
+}
 .disclosure-list__option > .icon{
     display:flex;
     width:14px;
@@ -9948,8 +9986,28 @@ button.btn.video__pause{
     margin-left:auto;
     color:var(--color-text);
   }
+.disclosure-list__option > .icon.disclosure-list__checkmark-icon{
+    display:none;
+  }
+.disclosure-list__item--current .disclosure-list__option > .icon.disclosure-list__checkmark-icon{
+    display:flex;
+  }
 .disclosure-list__option-label{
   color:var(--color-text);
+}
+/* Rest of World label styling */
+.disclosure-list__option .drawer-menu__currency,
+.disclosure-list__option .disclosure__currency{
+  color:var(--color-text);
+  opacity:0.85;
+  font-size:0.95em;
+  margin-left:6px;
+  white-space:nowrap;
+  display:inline-block;
+}
+.disclosure-list__option .disclosure-list__globe-icon{
+  flex:1 0 18px;
+  max-width:18px;
 }
 @media (min-width: 720px){
 .disclosure-list__option-label{
@@ -13403,8 +13461,44 @@ ul.drawer-menu__secondary-links .drawer-menu__item{
       margin-right:var(--spacing-3);
       margin-left:0;
     }
+.drawer-menu__item.localization-item .drawer-menu__globe-icon{
+      width:18px;
+      height:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-right:calc(4px * 3);
+      margin-right:var(--spacing-3);
+      margin-left:0;
+    }
+.drawer-menu__item.localization-item .drawer-menu__globe-icon svg{
+      width:100%;
+      height:100%;
+    }
 .drawer-menu__item.localization-item .icon-checkmark{
       margin-left:auto;
+    }
+.drawer-menu__item.localization-item .drawer-menu__link--label{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+.drawer-menu__item.localization-item .drawer-menu__currency{
+      color:var(--color-text-header-half-transparent);
+      font-size:0.95em;
+      white-space:nowrap;
+    }
+.drawer-menu__item.localization-item .drawer-menu__checkmark-icon{
+      margin-left:auto;
+      width:14px;
+      height:14px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      color:var(--color-text);
+    }
+.drawer-menu__item.drawer-menu__item--current .drawer-menu__checkmark-icon{
+      display:inline-flex;
     }
 .drawer-menu__item.drawer-menu__item--heading .drawer-menu__link{
       height:auto;
