@@ -216,6 +216,13 @@
             text: block.settings.popup_text
           %}
         {%- endif -%}
+      {%- when 'product_variations' -%}
+        {%- if prod != blank -%}
+          {%- render 'product-block-variations',
+            product: prod,
+            block: block
+          -%}
+        {%- endif -%}
       {%- when 'featured_products' -%}
         {%- render 'product-block-featured-products', block: block, product: prod -%}
 

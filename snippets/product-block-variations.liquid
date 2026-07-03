@@ -1,0 +1,253 @@
+{%- assign linked_products = block.settings.products -%}
+{%- assign metafield_parts = block.settings.option_value_metafield | strip | split: '.' -%}
+
+{%- if linked_products.size > 0 and metafield_parts.size > 1 -%}
+  {%- assign pv_ns = metafield_parts | first | strip -%}
+  {%- assign pv_key = metafield_parts | last | strip -%}
+
+  {%- assign current_option = product.metafields[pv_ns][pv_key] -%}
+  {%- assign current_label = blank -%}
+  {%- if current_option.type == 'metaobject_reference' -%}
+    {%- assign current_label = current_option.value.label | append: '' -%}
+  {%- elsif current_option.type == 'single_line_text_field' -%}
+    {%- assign current_label = current_option.value -%}
+  {%- elsif current_option.type == 'list.single_line_text_field' -%}
+    {%- assign current_label = current_option.value | first -%}
+  {%- elsif current_option.type == 'color' -%}
+    {%- assign current_label = current_option.value | append: '' -%}
+  {%- elsif current_option.type == 'list.metaobject_reference' -%}
+    {%- assign current_label = current_option.value | first | map: 'label' | first -%}
+  {%- endif -%}
+  {%- if current_label == blank -%}
+    {%- assign current_label = current_option | append: '' | strip -%}
+  {%- endif -%}
+
+  {%- assign pv_size = block.settings.swatch_size | default: 40 -%}
+  {%- assign pv_radius = 999 -%}
+  {%- if block.settings.radius == 'custom' -%}
+    {%- assign pv_radius = block.settings.border_radius | default: 0 -%}
+  {%- endif -%}
+
+  <style>
+    [data-block-id="{{ block.id }}"] .pv-list {
+      display: flex !important;
+      flex-wrap: wrap;
+      gap: 16px;
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 0 10px !important;
+    }
+    [data-block-id="{{ block.id }}"] .pv-item {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      list-style: none !important;
+    }
+    [data-block-id="{{ block.id }}"] .pv-circle {
+      display: block !important;
+      position: relative;
+      width: {{ pv_size }}px !important;
+      height: {{ pv_size }}px !important;
+      border-radius: {{ pv_radius }}px !important;
+      background-size: cover !important;
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      border: 1.5px solid rgba(0,0,0,0.2);
+      box-shadow: 0 0 0 2.5px #fff;
+      flex-shrink: 0;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+    }
+    [data-block-id="{{ block.id }}"] .pv-circle.pv-active {
+      border-color: #000 !important;
+      box-shadow: 0 0 0 2.5px #fff, 0 0 0 4px #000 !important;
+    }
+    [data-block-id="{{ block.id }}"] .pv-circle.pv-active::after {
+      content: '';
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #000;
+      box-shadow: 0 0 0 1.5px #fff;
+    }
+    [data-block-id="{{ block.id }}"] .pv-label {
+      display: block;
+      text-align: center;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: inherit;
+      margin-top: 6px;
+      max-width: {{ pv_size }}px;
+      line-height: 1.3;
+      
+    }
+    [data-block-id="{{ block.id }}"] .pv-btn-text {
+      display: inline-block;
+      border: 1px solid var(--color-border, #d0d0d0);
+      padding: 6px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s ease;
+    }
+    [data-block-id="{{ block.id }}"] .pv-btn-text.pv-active {
+      border-color: #000;
+      box-shadow: 0 0 0 1px #000 inset;
+    }
+    [data-block-id="{{ block.id }}"] .pv-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <div
+    data-block-id="{{ block.id }}"
+    class="wt-product__option"
+    {{ block.shopify_attributes }}
+  >
+    {%- if block.settings.option_name != blank -%}
+      <div class="pv-heading">
+        <span><strong>{{ block.settings.option_name }}:</strong> <strong>{{ current_label }}</strong></span>
+        {%- if block.settings.show_popup and block.settings.popup_link_text != blank -%}
+          {%- assign pv_show_popup = true -%}
+          {%- if block.settings.popup_metafield != blank -%}
+            {%- assign pv_popup_parts = block.settings.popup_metafield | strip | split: '.' -%}
+            {%- if pv_popup_parts.size > 1 -%}
+              {%- assign pv_popup_val = product.metafields[pv_popup_parts[0]][pv_popup_parts[1]] -%}
+              {%- if pv_popup_val == blank -%}{%- assign pv_show_popup = false -%}{%- endif -%}
+            {%- endif -%}
+          {%- endif -%}
+          {%- if pv_show_popup -%}
+            {%- render 'popup',
+              product: product,
+              id: block.id,
+              shopify_attributes: block.shopify_attributes,
+              size_icon: 'none',
+              size_link: block.settings.popup_link_text,
+              size_page: block.settings.popup_content,
+              size_content: block.settings.popup_content,
+              metaobject_key: block.settings.popup_metafield,
+              metafield_name: block.settings.popup_metafield,
+              enable-striped-rows: true
+            -%}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <ul class="pv-list">
+      {%- assign pv_seen = ',' -%}
+      {%- for linked_product in linked_products -%}
+        {%- assign pv_name = blank -%}
+        {%- assign pv_color = blank -%}
+        {%- assign pv_image = blank -%}
+        {%- assign pv_val = linked_product.metafields[pv_ns][pv_key] -%}
+
+        {%- if pv_val.type == 'metaobject_reference' -%}
+          {%- assign pv_mo = pv_val.value -%}
+          {%- assign pv_name = pv_mo.label | append: '' | strip -%}
+          {%- liquid
+            assign pv_color = pv_mo.color | append: '' | strip
+            if pv_color == blank
+              assign pv_color = pv_mo.swatch_color | append: '' | strip
+            endif
+            if pv_color == blank
+              assign pv_color = pv_mo.hex_color | append: '' | strip
+            endif
+            if pv_color == blank
+              assign pv_color = pv_mo.colour | append: '' | strip
+            endif
+          -%}
+          {%- if pv_mo.image != blank -%}
+            {%- assign pv_image = pv_mo.image -%}
+          {%- elsif pv_mo.pattern_image != blank -%}
+            {%- assign pv_image = pv_mo.pattern_image -%}
+          {%- elsif pv_mo.swatch_image != blank -%}
+            {%- assign pv_image = pv_mo.swatch_image -%}
+          {%- endif -%}
+
+        {%- elsif pv_val.type == 'list.metaobject_reference' -%}
+          {%- assign pv_mo = pv_val.value | first -%}
+          {%- assign pv_name = pv_mo.label | append: '' | strip -%}
+          {%- assign pv_color = pv_mo.color | append: '' | strip -%}
+          {%- if pv_mo.image != blank -%}{%- assign pv_image = pv_mo.image -%}{%- endif -%}
+
+        {%- elsif pv_val.type == 'color' -%}
+          {%- assign pv_color = pv_val.value | append: '' | strip -%}
+          {%- assign pv_name = pv_color -%}
+
+        {%- elsif pv_val.type == 'single_line_text_field' -%}
+          {%- assign pv_name = pv_val.value | strip -%}
+          {%- assign pv_color = pv_val.value | downcase | strip -%}
+
+        {%- elsif pv_val.type == 'list.single_line_text_field' -%}
+          {%- assign pv_name = pv_val.value | first | strip -%}
+          {%- assign pv_color = pv_val.value | first | downcase | strip -%}
+
+        {%- else -%}
+          {%- assign pv_name = pv_val | append: '' | strip -%}
+        {%- endif -%}
+
+        {%- assign pv_dedup = pv_name | append: ',' -%}
+        {%- if pv_name != blank -%}
+          {%- unless pv_seen contains pv_dedup -%}
+            {%- assign pv_seen = pv_seen | append: pv_dedup -%}
+            {%- assign pv_is_active = false -%}
+            {%- if pv_name == current_label or linked_product.id == product.id -%}
+              {%- assign pv_is_active = true -%}
+            {%- endif -%}
+
+            <li class="pv-item">
+              {%- case block.settings.picker_type -%}
+
+                {%- when 'button' -%}
+                  <a
+                    href="{{ linked_product.url }}"
+                    class="pv-btn-text{% if pv_is_active %} pv-active{% endif %}"
+                    title="{{ pv_name }}"
+                  >{{ pv_name }}</a>
+
+                {%- when 'swatch' -%}
+                  {%- assign pv_style = '' -%}
+                  {%- if pv_image != blank -%}
+                    {%- assign pv_img_url = pv_image | image_url: width: 120 -%}
+                    {%- assign pv_style = 'background-image:url(' | append: pv_img_url | append: ');background-size:cover;' -%}
+                  {%- elsif pv_color != blank -%}
+                    {%- assign pv_style = 'background-color:' | append: pv_color | append: ';' -%}
+                  {%- endif -%}
+                  <a href="{{ linked_product.url }}" class="pv-circle{% if pv_is_active %} pv-active{% endif %}" style="{{ pv_style }}" title="{{ pv_name }}" aria-label="{{ pv_name }}"></a>
+                  <span class="pv-label">{{ pv_name }}</span>
+
+                {%- when 'color_button', 'color_button_with_name' -%}
+                  {%- assign pv_style = 'background:#ececec;' -%}
+                  {%- if pv_color != blank -%}
+                    {%- assign pv_style = 'background-color:' | append: pv_color | append: ';' -%}
+                  {%- elsif pv_image != blank -%}
+                    {%- assign pv_img_url = pv_image | image_url: width: 120 -%}
+                    {%- assign pv_style = 'background-image:url(' | append: pv_img_url | append: ');background-size:cover;background-position:center center;' -%}
+                  {%- endif -%}
+                  <a href="{{ linked_product.url }}" class="pv-circle{% if pv_is_active %} pv-active{% endif %}" style="{{ pv_style }}" title="{{ pv_name }}" aria-label="{{ pv_name }}"></a>
+                  {%- if block.settings.picker_type == 'color_button_with_name' -%}
+                    <span class="pv-label">{{ pv_name }}</span>
+                  {%- endif -%}
+
+              {%- endcase -%}
+            </li>
+
+          {%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}

@@ -46,6 +46,22 @@
             "chip_layout": "natural"
           }
         },
+        "product_variations_kdXbd7": {
+          "type": "product_variations",
+          "settings": {
+            "option_name": "Choose Your Style",
+            "picker_type": "color_button_with_name",
+            "swatch_size": 30,
+            "radius": "default",
+            "border_radius": 0,
+            "option_value_metafield": "shopify.color-pattern",
+            "products": "{{ product.metafields.custom.swatch_products.value }}",
+            "show_popup": false,
+            "popup_link_text": "",
+            "popup_content": "",
+            "popup_metafield": ""
+          }
+        },
         "family_bundle": {
           "type": "family_bundle",
           "settings": {
@@ -298,6 +314,7 @@
         "product_header",
         "lipscore_reviews_lipscore_product_rating_rriKkL",
         "variant_picker",
+        "product_variations_kdXbd7",
         "family_bundle",
         "size_guide_NdkWdL",
         "inventory-counter",

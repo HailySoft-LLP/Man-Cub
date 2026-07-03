@@ -1264,6 +1264,123 @@
       ]
     },
     {
+      "type": "product_variations",
+      "name": "Product variations",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Link other variations of product and display them as Images or Swatches. For more information visit our Support page. [Read more](https://www.support.wonder-theme.com/question/product-variations-block)"
+        },
+        {
+          "type": "text",
+          "id": "option_name",
+          "label": "Option name",
+          "info": "Example: Color, Style"
+        },
+        {
+          "type": "select",
+          "id": "picker_type",
+          "options": [
+            {
+              "value": "button",
+              "label": "Button"
+            },
+            {
+              "value": "swatch",
+              "label": "Swatch / Image"
+            },
+            {
+              "value": "color_button",
+              "label": "Color Button"
+            },
+            {
+              "value": "color_button_with_name",
+              "label": "Color Button with Name"
+            }
+          ],
+          "default": "swatch",
+          "label": "Input type",
+          "info": "Select the type of input to display"
+        },
+        {
+          "id": "swatch_size",
+          "type": "range",
+          "default": 40,
+          "label": "Swatch / Image size",
+          "min": 20,
+          "max": 100,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "id": "radius",
+          "type": "select",
+          "options": [
+            {
+              "value": "default",
+              "label": "Default"
+            },
+            {
+              "value": "custom",
+              "label": "Custom"
+            }
+          ],
+          "default": "default",
+          "label": "Swatch / Image border radius"
+        },
+        {
+          "id": "border_radius",
+          "type": "range",
+          "default": 0,
+          "label": "Custom border radius",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px"
+        },
+        {
+          "type": "text",
+          "id": "option_value_metafield",
+          "label": "Option value metafield",
+          "info": "Namespace and key of metafield holding the value of option (Example: custom.color). For Swatch type, it should be a single metaobjects containing Label and Image or Color (HEX). For Button it must be a single line text or metaobject containing Label. "
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Products",
+          "info": "Select all variations including the current product, (Suggestion: use metafield to store product list when product template is going to be used for multiple products)"
+        },
+        {
+          "type": "header",
+          "content": "Information popup"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_popup",
+          "label": "Show information popup link",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "popup_link_text",
+          "label": "Link text",
+          "info": "Text shown as the clickable link next to the option heading"
+        },
+        {
+          "type": "page",
+          "id": "popup_content",
+          "label": "Content",
+          "info": "Choose a page as the popup content source"
+        },
+        {
+          "type": "text",
+          "id": "popup_metafield",
+          "label": "Metafield",
+          "info": "Provide metafield namespace and key to retrieve content (example: custom.size_guide_content). If filled, this takes priority over the page content."
+        }
+      ]
+    },
+    {
       "type": "featured_products",
       "name": "t:sections.shared.product.blocks.featured_products.name",
       "limit": 1,
