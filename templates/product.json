@@ -48,9 +48,10 @@
         },
         "product_variations_kdXbd7": {
           "type": "product_variations",
+          "disabled": true,
           "settings": {
             "option_name": "Choose Your Style",
-            "picker_type": "color_button_with_name",
+            "picker_type": "color_button",
             "swatch_size": 30,
             "radius": "default",
             "border_radius": 0,

@@ -1,0 +1,533 @@
+{%- liquid
+  assign fg_man           = free_gift_product
+  assign fg_cub           = free_gift_cub_product
+  assign popup_is_enabled = free_gift_popup_enabled
+-%}
+
+{%- if fg_man != blank and popup_is_enabled -%}
+{%- liquid
+  assign popup_heading = free_gift_popup_heading | default: "You've unlocked a free gift!"
+  assign popup_subtext = free_gift_popup_subtext | default: 'Choose your size below and claim your free cap.'
+  assign popup_btn     = free_gift_popup_button  | default: 'Claim Free Gift'
+  assign man_label     = free_gift_popup_man_label | default: 'Man'
+  assign cub_label     = free_gift_popup_cub_label | default: 'Cub'
+-%}
+
+<div id="free-gift-popup" class="free-gift-popup" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="free-gift-popup__overlay"></div>
+  <div class="free-gift-popup__dialog">
+    <button type="button" class="free-gift-popup__close" aria-label="Close">
+      {%- render 'icon', icon: 'close' -%}
+    </button>
+
+    {%- liquid
+      assign popup_image = fg_man.featured_image
+      if popup_image == blank and fg_cub != blank
+        assign popup_image = fg_cub.featured_image
+      endif
+      assign man_size_option = fg_man.options_with_values | first
+      assign cub_size_option = blank
+      if fg_cub != blank
+        assign cub_size_option = fg_cub.options_with_values | first
+      endif
+    -%}
+
+    {%- if popup_image != blank -%}
+      <div class="free-gift-popup__hero-image">
+        <img
+          src="{{ popup_image | image_url: width: 480 }}"
+          alt="{{ fg_man.title | escape }}"
+          width="200"
+          height="200"
+          loading="lazy"
+        >
+      </div>
+    {%- endif -%}
+
+    <h3 class="free-gift-popup__heading ff-heading fs-heading-5-base">{{ popup_heading }}</h3>
+    <p class="free-gift-popup__subtext ff-body fs-body-75">{{ popup_subtext }}</p>
+
+    <div class="free-gift-popup__rows">
+      <div class="free-gift-popup__row" data-gift-type-row="man">
+        <span class="free-gift-popup__row-label ff-body fs-body-75">{{ man_label }}:</span>
+        <div class="free-gift-popup__row-options">
+          {%- if man_size_option != blank and man_size_option.values.size > 0 -%}
+            {%- for value in man_size_option.values -%}
+              {%- assign man_opt_available = false -%}
+              {%- for variant in fg_man.variants -%}
+                {%- if variant.option1 == value and variant.available -%}
+                  {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}
+                    {%- assign man_opt_available = true -%}
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if man_opt_available -%}
+                <button
+                  type="button"
+                  class="free-gift-popup__option-btn"
+                  data-gift-type="man"
+                  data-option-index="0"
+                  data-option-value="{{ value | escape }}"
+                >{{ value }}</button>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- elsif free_gift_popup_man_sizes != blank -%}
+            {%- assign man_size_fallback = free_gift_popup_man_sizes | split: ',' -%}
+            {%- for value in man_size_fallback -%}
+              <button
+                type="button"
+                class="free-gift-popup__option-btn"
+                data-gift-type="man"
+                data-option-index="0"
+                data-option-value="{{ value | strip | escape }}"
+              >{{ value | strip }}</button>
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if fg_cub != blank -%}
+        <div class="free-gift-popup__row" data-gift-type-row="cub">
+          <span class="free-gift-popup__row-label ff-body fs-body-75">{{ cub_label }}:</span>
+          <div class="free-gift-popup__row-options">
+            {%- if cub_size_option != blank and cub_size_option.values.size > 0 -%}
+              {%- for value in cub_size_option.values -%}
+                {%- assign cub_opt_available = false -%}
+                {%- for variant in fg_cub.variants -%}
+                  {%- if variant.option1 == value and variant.available -%}
+                    {%- if variant.inventory_management == blank or variant.inventory_quantity > 0 or variant.inventory_policy == 'continue' -%}
+                      {%- assign cub_opt_available = true -%}
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if cub_opt_available -%}
+                  <button
+                    type="button"
+                    class="free-gift-popup__option-btn"
+                    data-gift-type="cub"
+                    data-option-index="0"
+                    data-option-value="{{ value | escape }}"
+                  >{{ value }}</button>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- elsif free_gift_popup_cub_sizes != blank -%}
+              {%- assign cub_size_fallback = free_gift_popup_cub_sizes | split: ',' -%}
+              {%- for value in cub_size_fallback -%}
+                <button
+                  type="button"
+                  class="free-gift-popup__option-btn"
+                  data-gift-type="cub"
+                  data-option-index="0"
+                  data-option-value="{{ value | strip | escape }}"
+                >{{ value | strip }}</button>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <button
+      type="button"
+      class="free-gift-popup__add btn btn--primary"
+      id="free-gift-popup-add"
+      data-label="{{ popup_btn | escape }}"
+      disabled
+    >
+      {{ popup_btn }}
+    </button>
+
+    {{- '<!-- Variant data for JS -->' }}
+    <script type="application/json" id="free-gift-man-variants-json">
+      {{ fg_man.variants | json }}
+    </script>
+    {%- if fg_cub != blank -%}
+      <script type="application/json" id="free-gift-cub-variants-json">
+        {{ fg_cub.variants | json }}
+      </script>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .free-gift-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .free-gift-popup.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .free-gift-popup__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .free-gift-popup.is-open .free-gift-popup__overlay {
+    opacity: 1;
+  }
+  .free-gift-popup__dialog {
+    position: relative;
+    background: var(--color-background, #fff);
+    border-radius: 12px;
+    padding: 36px 24px 24px;
+    max-width: 520px;
+    width: calc(100% - 32px);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+    transform: translateY(16px);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    text-align: center;
+  }
+  .free-gift-popup.is-open .free-gift-popup__dialog {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .free-gift-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 0;
+    color: var(--color-foreground, #000);
+    opacity: 0.6;
+    transition: opacity 0.15s;
+  }
+  .free-gift-popup__close:hover { opacity: 1; }
+  .free-gift-popup__hero-image {
+    margin: 0 auto 14px;
+  }
+  .free-gift-popup__hero-image img {
+    width: 128px;
+    height: 128px;
+    object-fit: contain;
+  }
+  .free-gift-popup__heading { margin: 0 0 6px; }
+  .free-gift-popup__subtext { margin: 0 0 16px; opacity: 0.7; }
+
+  .free-gift-popup__rows {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .free-gift-popup__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+  .free-gift-popup__row:last-child { border-bottom: 0; }
+  .free-gift-popup__row-label {
+    min-width: 44px;
+    margin-top: 7px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-align: left;
+  }
+  .free-gift-popup__row-options {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: flex-start;
+  }
+  .free-gift-popup__option-btn {
+    padding: 4px 11px;
+    border: 1px solid var(--color-border, #d9d9d9);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .free-gift-popup__option-btn:hover {
+    border-color: var(--color-foreground, #000);
+  }
+  .free-gift-popup__option-btn.is-selected {
+    border-color: var(--color-foreground, #000);
+    background: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
+  }
+  .free-gift-popup__add {
+    width: 100%;
+    margin-top: 4px;
+  }
+  .free-gift-popup__add:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  @media (max-width: 480px) {
+    .free-gift-popup__row {
+      flex-direction: column;
+      gap: 5px;
+    }
+    .free-gift-popup__row-label {
+      min-width: 0;
+      margin-top: 0;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    var SESSION_KEY  = 'mc_free_gift_popup_dismissed';
+    var LISTENER_KEY = 'MCFreeGiftPopupListeners';
+    var routes = (window.theme && window.theme.routes && window.theme.routes.cart) || {};
+
+    function jsonRoute(r) { return r.slice(-3) === '.js' ? r : r + '.js'; }
+    function cartRoute(key, fallback) { return jsonRoute(routes[key] || fallback); }
+
+    // ── DOM helpers (always fresh – popup re-renders with AJAX) ─────
+    function getPopup()  { return document.getElementById('free-gift-popup'); }
+    function getAddBtn() { return document.getElementById('free-gift-popup-add'); }
+
+    function getVariants(type) {
+      var id = 'free-gift-' + type + '-variants-json';
+      var el = document.getElementById(id);
+      return el ? JSON.parse(el.textContent || '[]') : [];
+    }
+
+    // ── State ──────────────────────────────────────────────────────
+    var state = { man: {}, cub: {} };
+
+    function resetState() { state = { man: {}, cub: {} }; }
+
+    // ── Variant resolution ─────────────────────────────────────────
+    function findVariantId(type, selectedOptions) {
+      var variants = getVariants(type);
+      var optionCount = getOptionCountForType(type);
+      if (optionCount === 0) {
+        for (var k = 0; k < variants.length; k++) {
+          if (variants[k].available) return variants[k].id;
+        }
+        return null;
+      }
+      if (Object.keys(selectedOptions).length < optionCount) return null;
+
+      for (var i = 0; i < variants.length; i++) {
+        var v = variants[i];
+        if (!v.available) continue;
+        var match = true;
+        for (var j = 0; j < optionCount; j++) {
+          if (v['option' + (j + 1)] !== selectedOptions[j]) { match = false; break; }
+        }
+        if (match) return v.id;
+      }
+      return null;
+    }
+
+    function getOptionCountForType(type) {
+      var popup = getPopup();
+      if (!popup) return 0;
+      var row = popup.querySelector('[data-gift-type-row="' + type + '"]');
+      if (!row) return 0;
+      var indices = {};
+      row.querySelectorAll('.free-gift-popup__option-btn').forEach(function (btn) {
+        indices[String(btn.dataset.optionIndex || '0')] = true;
+      });
+      return Object.keys(indices).length;
+    }
+
+    function hasType(type) {
+      return !!document.getElementById('free-gift-' + type + '-variants-json');
+    }
+
+    function currentVariantIds() {
+      var ids = [];
+
+      // Man selection is always required.
+      var manId = findVariantId('man', state.man);
+      if (!manId) return [];
+      ids.push(manId);
+
+      // Cub selection is required when cub gift is configured.
+      if (hasType('cub')) {
+        var cubId = findVariantId('cub', state.cub);
+        if (!cubId) return [];
+        ids.push(cubId);
+      }
+
+      return ids;
+    }
+
+    function refreshAddBtn() {
+      var btn = getAddBtn();
+      if (btn) btn.disabled = currentVariantIds().length === 0;
+    }
+
+    // ── Open / close ───────────────────────────────────────────────
+    function openPopup() {
+      var popup = getPopup();
+      if (!popup) return;
+      window.MCFreeGiftPopupOpen = true;
+      popup.classList.add('is-open');
+      popup.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePopup(dismiss) {
+      var popup = getPopup();
+      window.MCFreeGiftPopupOpen = false;
+      if (popup) {
+        popup.classList.remove('is-open');
+        popup.setAttribute('aria-hidden', 'true');
+      }
+      document.body.style.overflow = '';
+      resetState();
+      if (dismiss !== false) sessionStorage.setItem(SESSION_KEY, '1');
+    }
+
+    // ── Cart helpers ───────────────────────────────────────────────
+    function getThreshold() {
+      var cfg = (window.theme && window.theme.autoFreeCap) || {};
+      var currency = ((window.Shopify && window.Shopify.currency && window.Shopify.currency.active)
+        || cfg.currentCurrency || 'GBP').toUpperCase();
+      var map = cfg.thresholdsByCurrency || {};
+      return map[currency] || Number(cfg.otherThresholdCents) || Number(cfg.thresholdCents) || 15000;
+    }
+
+    function hasGiftInCart(cart) {
+      return (cart.items || []).some(function (item) {
+        var p = item.properties || {};
+        return p['_auto_free_cap'] === 'true' || p['_cart_free_gift'] === 'true';
+      });
+    }
+
+    function qualifyingTotal(cart) {
+      return (cart.items || []).reduce(function (sum, item) {
+        var p = item.properties || {};
+        if (p['_auto_free_cap'] === 'true' || p['_cart_free_gift'] === 'true') return sum;
+        return sum + (Number(item.final_line_price) || Number(item.line_price) || 0);
+      }, 0);
+    }
+
+    function maybeShow(cart) {
+      var eligible = qualifyingTotal(cart) >= getThreshold();
+      if (!eligible) { sessionStorage.removeItem(SESSION_KEY); return; }
+      if (hasGiftInCart(cart)) return;
+      if (window.MCFreeGiftPopupOpen) return;
+      if (sessionStorage.getItem(SESSION_KEY)) return;
+      openPopup();
+    }
+
+    function fetchAndShow() {
+      fetch(cartRoute('base', '/cart'), { credentials: 'include', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (r) { return r.json(); })
+        .then(maybeShow)
+        .catch(function () {});
+    }
+
+    // ── Bind interactions (re-runs after every AJAX re-render) ─────
+    function bindPopupInteraction() {
+      var popup  = getPopup();
+      var addBtn = getAddBtn();
+      if (!popup || !addBtn) return;
+      if (popup.dataset.freeGiftPopupBound === 'true') return;
+      popup.dataset.freeGiftPopupBound = 'true';
+
+      var overlay  = popup.querySelector('.free-gift-popup__overlay');
+      var closeBtn = popup.querySelector('.free-gift-popup__close');
+      if (overlay)  overlay.addEventListener('click',  function () { closePopup(true); });
+      if (closeBtn) closeBtn.addEventListener('click', function () { closePopup(true); });
+
+      // Size option buttons — each has data-gift-type, data-option-index, data-option-value
+      popup.querySelectorAll('.free-gift-popup__option-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var clickedType = this.dataset.giftType;
+          var idx         = Number(this.dataset.optionIndex);
+          var val         = this.dataset.optionValue;
+
+          // Deselect other buttons in same option group (same type + same option index)
+          popup.querySelectorAll('[data-gift-type="' + clickedType + '"][data-option-index="' + idx + '"]')
+            .forEach(function (b) { b.classList.remove('is-selected'); });
+
+          this.classList.add('is-selected');
+          state[clickedType][idx] = val;
+
+          refreshAddBtn();
+        });
+      });
+
+      // Add to cart
+      addBtn.addEventListener('click', function () {
+        var variantIds = currentVariantIds();
+        if (!variantIds.length) return;
+        var btn = getAddBtn();
+        var originalLabel = (btn && btn.dataset.label) || 'Claim Free Gift';
+        if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
+
+        var items = variantIds.map(function (id) {
+          return { id: id, quantity: 1, properties: { '_auto_free_cap': 'true' } };
+        });
+
+        fetch(cartRoute('add', '/cart/add'), {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: items })
+        })
+        .then(function (r) {
+          if (!r.ok) throw new Error('Add failed');
+          return r.json();
+        })
+        .then(function () {
+          closePopup(true);
+          document.dispatchEvent(new CustomEvent('apps:product-added-to-cart', { detail: { source: 'free-gift-popup' } }));
+          document.dispatchEvent(new CustomEvent('cart:updated', { detail: { source: 'free-gift-popup' } }));
+          document.dispatchEvent(new CustomEvent('cart:update'));
+        })
+        .catch(function () {
+          var b = getAddBtn();
+          if (b) { b.disabled = false; b.textContent = originalLabel; }
+        });
+      });
+
+      refreshAddBtn();
+    }
+
+    // ── Global document listeners — set up only once ───────────────
+    if (!window[LISTENER_KEY]) {
+      window[LISTENER_KEY] = true;
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && window.MCFreeGiftPopupOpen) closePopup(true);
+      });
+
+      document.addEventListener('cart:updated', function (e) {
+        if (!window.MCFreeGiftPopupEnabled) return;
+        if (e.detail && (e.detail.source === 'free-gift-popup' || e.detail.source === 'auto-free-cap')) return;
+        if (e.detail && e.detail.cart) { maybeShow(e.detail.cart); } else { fetchAndShow(); }
+      });
+
+      document.addEventListener('apps:product-added-to-cart', function (e) {
+        if (!window.MCFreeGiftPopupEnabled) return;
+        if (e.detail && (e.detail.source === 'free-gift-popup' || e.detail.source === 'auto-free-cap')) return;
+        if (e.detail && e.detail.cart) { maybeShow(e.detail.cart); } else { fetchAndShow(); }
+      });
+    }
+
+    // Re-bind after every section re-render, then check threshold
+    bindPopupInteraction();
+    fetchAndShow();
+  })();
+</script>
+{%- endif -%}

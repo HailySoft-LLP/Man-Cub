@@ -85,6 +85,9 @@
     var currency = activeCurrency();
     if (THRESHOLDS_BY_CURRENCY[currency]) return THRESHOLDS_BY_CURRENCY[currency];
 
+    var otherThreshold = Number(config.otherThresholdCents);
+    if (otherThreshold > 0) return otherThreshold;
+
     var marketRate = 1;
     if (window.theme && typeof window.theme.getDisplayedCurrencyRate === 'function') {
       marketRate = parseFloat(window.theme.getDisplayedCurrencyRate()) || 1;
@@ -97,13 +100,15 @@
     return Math.round(BASE_THRESHOLD_CENTS * marketRate);
   }
 
-  function isAutoGiftItem(item, variantId) {
+  function hasGiftProperty(item) {
     var properties = item.properties || {};
-    return String(item.variant_id) === String(variantId)
-      && (
-        String(properties[GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE
-        || String(properties[LEGACY_GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE
-      );
+    return String(properties[GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE
+      || String(properties[LEGACY_GIFT_PROPERTY_NAME]) === GIFT_PROPERTY_VALUE;
+  }
+
+  function isAutoGiftItem(item, variantId) {
+    var matchesVariant = variantId == null || String(item.variant_id) === String(variantId);
+    return matchesVariant && hasGiftProperty(item);
   }
 
   function isGiftVariant(item, variantId) {
@@ -112,7 +117,7 @@
 
   function qualifyingSubtotal(cart, variantId) {
     return (cart.items || []).reduce(function (total, item) {
-      if (isAutoGiftItem(item, variantId)) return total;
+      if (hasGiftProperty(item)) return total;
 
       var linePrice = typeof item.final_line_price === 'number'
         ? item.final_line_price
@@ -242,14 +247,39 @@
         if (!variantId) return currentCart;
 
         var items = currentCart.items || [];
-        var autoGiftItems = items.filter(function (item) {
-          return isAutoGiftItem(item, variantId);
-        });
+        var autoGiftItems = items.filter(hasGiftProperty);
+
         var customerGiftItem = items.find(function (item) {
           return isGiftVariant(item, variantId) && !isAutoGiftItem(item, variantId);
         });
         var autoGiftItem = autoGiftItems[0];
         var isEligible = qualifyingSubtotal(currentCart, variantId) >= activeThresholdCents();
+
+        function changeAutoGiftItemsToQuantity(quantity) {
+          var sequence = Promise.resolve();
+
+          autoGiftItems.forEach(function (item) {
+            if (item.quantity === quantity) return;
+            sequence = sequence.then(function () {
+              return changeCart({ id: item.key, quantity: quantity });
+            });
+          });
+
+          return sequence.then(afterCartMutation);
+        }
+
+        // In popup mode the customer chooses the gift variant in the popup.
+        if (window.MCFreeGiftPopupEnabled) {
+          if (!isEligible && autoGiftItems.length) {
+            return changeAutoGiftItemsToQuantity(0);
+          }
+
+          if (isEligible && autoGiftItems.some(function (item) { return item.quantity !== 1; })) {
+            return changeAutoGiftItemsToQuantity(1);
+          }
+
+          return currentCart;
+        }
 
         if (isEligible && !autoGiftItem && !customerGiftItem) {
           return addGift(variantId).then(afterCartMutation);

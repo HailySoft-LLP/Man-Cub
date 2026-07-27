@@ -71,6 +71,7 @@
     "product_listing_show_discount": true,
     "product_listing_discount_format": "sale_text",
     "product_listing_badge_position": "top_right",
+    "show_cart_notes": false,
     "enable_free_shipping_bar": false,
     "free_shipping_threshold": "100",
     "enable_cross_sells": false,

@@ -1,6 +1,64 @@
 {%- if section.settings.enable_quick_cart -%}
+  {%- liquid
+    assign free_gift_parent_product = blank
+
+    for item in cart.items
+      unless item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true'
+        assign item_parent_product = item.product
+        if item_parent_product != blank
+          assign item_man_child = item_parent_product.metafields.custom.man_product.value
+          assign item_cub_child = item_parent_product.metafields.custom.kid_product.value
+          if item_man_child != blank or item_cub_child != blank
+            assign free_gift_parent_product = item_parent_product
+          endif
+        endif
+      endunless
+    endfor
+
+    assign free_gift_product = section.settings.auto_free_cap_product
+    assign free_gift_cub_product = section.settings.auto_free_cap_cub_product
+
+    if free_gift_parent_product != blank
+      assign parent_man_product = free_gift_parent_product.metafields.custom.man_product.value
+      assign parent_cub_product = free_gift_parent_product.metafields.custom.kid_product.value
+
+      if parent_man_product != blank
+        assign free_gift_product = parent_man_product
+      endif
+
+      if parent_cub_product != blank
+        assign free_gift_cub_product = parent_cub_product
+      endif
+    endif
+
+    assign free_gift_variant_id = blank
+
+    if free_gift_product != blank
+      assign free_gift_variant_id = free_gift_product.selected_or_first_available_variant.id
+    endif
+  -%}
   {{ 'family-bundle.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'family-bundle.js' | asset_url }}" defer="defer"></script>
+  <script>
+    window.theme = window.theme || {};
+    window.MCFreeGiftPopupEnabled = {{ section.settings.free_gift_popup_enabled | json }};
+    window.theme.autoFreeCap = Object.assign({}, window.theme.autoFreeCap || {}, {
+      thresholdCents: {{ section.settings.auto_free_cap_threshold_gbp | default: '150' | plus: 0 | times: 100 }},
+      currentCurrency: {{ localization.country.currency.iso_code | json }},
+      thresholdsByCurrency: {
+        GBP: {{ section.settings.auto_free_cap_threshold_gbp | default: '150' | plus: 0 | times: 100 }},
+        USD: {{ section.settings.auto_free_cap_threshold_usd | default: '200' | plus: 0 | times: 100 }},
+        EUR: {{ section.settings.auto_free_cap_threshold_eur | default: '175' | plus: 0 | times: 100 }},
+        CAD: {{ section.settings.auto_free_cap_threshold_cad | default: '300' | plus: 0 | times: 100 }},
+        AED: {{ section.settings.auto_free_cap_threshold_aed | default: '750' | plus: 0 | times: 100 }}
+      },
+      otherThresholdCents: {{ section.settings.auto_free_cap_threshold_other | default: '150' | plus: 0 | times: 100 }},
+      {% if free_gift_product != blank %}
+      variantId: {% if free_gift_variant_id != blank %}{{ free_gift_variant_id | json }}{% else %}null{% endif %},
+      productHandle: {{ free_gift_product.handle | json }}
+      {% endif %}
+    });
+  </script>
   <div
     class="
       quick-cart
@@ -43,7 +101,14 @@
           >
             <div class="quick-cart__items animation--quick-cart-items">
               {%- render 'free-shipping-bar' %}
-              {%- render 'cart-free-cap-progress' %}
+              {%- render 'cart-free-cap-progress',
+                free_cap_threshold_gbp: section.settings.auto_free_cap_threshold_gbp,
+                free_cap_threshold_usd: section.settings.auto_free_cap_threshold_usd,
+                free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
+                free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
+                free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
+                free_cap_success_message: section.settings.auto_free_cap_success_message
+              -%}
 
               {%- assign rendered_bundle_ids_qc = '' -%}
               {%- for item in cart.items -%}
@@ -277,20 +342,27 @@
             <h3 class="quick-cart__empty-state-heading ff-heading fs-heading fs-heading-4-base">
               {{ 'cart.general.empty' | t }}
             </h3>
-            {%- render 'cart-free-cap-progress' %}
-            {%- if section.settings.collection_list != blank -%}
-              {%- if section.settings.promotion_text != blank -%}
+            {%- render 'cart-free-cap-progress',
+              free_cap_threshold_gbp: section.settings.auto_free_cap_threshold_gbp,
+              free_cap_threshold_usd: section.settings.auto_free_cap_threshold_usd,
+              free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
+              free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
+              free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
+              free_cap_success_message: section.settings.auto_free_cap_success_message
+            -%}
+            {%- if settings.collection_list != blank -%}
+              {%- if settings.promotion_text != blank -%}
                 <div class="quick-cart__empty-state-promot-text rte ff-body fs-body-100">
-                  {{ section.settings.promotion_text }}
+                  {{ settings.promotion_text }}
                 </div>
               {%- endif -%}
 
-              {%- for collection in section.settings.collection_list -%}
+              {%- for collection in settings.collection_list -%}
                 {%- render 'button-block',
                   wrapper_class: 'quick-cart__empty-state-promo-button',
                   link: collection.url,
                   label: collection.title,
-                  button_style: section.settings.collection_list_button_style,
+                  button_style: settings.collection_list_button_style,
                   button_alignment: 'center'
                 -%}
               {%- endfor -%}
@@ -299,9 +371,9 @@
 
               {%- render 'button-block',
                 wrapper_class: 'quick-cart__empty-state-promo-button',
-                link: section.settings.continue_shopping_link,
+                link: settings.continue_shopping_link,
                 label: empty_label,
-                button_style: section.settings.collection_list_button_style,
+                button_style: settings.collection_list_button_style,
                 button_alignment: 'center'
               -%}
             {%- endif -%}
@@ -310,6 +382,19 @@
       </div>
     </div>
   </div>
+
+  {%- render 'free-gift-popup',
+    free_gift_product: free_gift_product,
+    free_gift_cub_product: free_gift_cub_product,
+    free_gift_popup_enabled: section.settings.free_gift_popup_enabled,
+    free_gift_popup_heading: section.settings.free_gift_popup_heading,
+    free_gift_popup_subtext: section.settings.free_gift_popup_subtext,
+    free_gift_popup_button: section.settings.free_gift_popup_button,
+    free_gift_popup_man_label: section.settings.free_gift_popup_man_label,
+    free_gift_popup_cub_label: section.settings.free_gift_popup_cub_label,
+    free_gift_popup_man_sizes: section.settings.free_gift_popup_man_sizes,
+    free_gift_popup_cub_sizes: section.settings.free_gift_popup_cub_sizes
+  -%}
 {%- endif -%}
 
 {% schema %}
@@ -322,6 +407,118 @@
       "label": "t:sections.quick_cart.settings.enable_quick_cart.label",
       "info": "t:sections.quick_cart.settings.enable_quick_cart.info",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Auto free cap"
+    },
+    {
+      "type": "product",
+      "id": "auto_free_cap_product",
+      "label": "Free gift man product"
+    },
+    {
+      "type": "product",
+      "id": "auto_free_cap_cub_product",
+      "label": "Free gift cub product",
+      "info": "Optional. If left blank, the popup uses the man gift product and saves Cub as a cart property."
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_gbp",
+      "label": "GBP threshold",
+      "default": "150"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_usd",
+      "label": "USD threshold",
+      "default": "200"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_eur",
+      "label": "EUR threshold",
+      "default": "175"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_cad",
+      "label": "CAD threshold",
+      "default": "300"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_aed",
+      "label": "AED threshold",
+      "default": "750"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_other",
+      "label": "Other currency threshold",
+      "default": "150"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_success_message",
+      "label": "Free gift added message",
+      "default": "Your free cap has been added to your cart"
+    },
+    {
+      "type": "header",
+      "content": "Free gift popup"
+    },
+    {
+      "type": "checkbox",
+      "id": "free_gift_popup_enabled",
+      "label": "Show popup (let customer choose size)",
+      "info": "When OFF, the gift product is added automatically without a popup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_heading",
+      "label": "Popup heading",
+      "default": "You've unlocked a free gift!"
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_subtext",
+      "label": "Popup subtext",
+      "default": "Choose your size below and claim your free cap."
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_button",
+      "label": "Popup button label",
+      "default": "Claim Free Gift"
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_man_label",
+      "label": "Man option label",
+      "default": "MAN"
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_cub_label",
+      "label": "Cub option label",
+      "default": "CUB"
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_man_sizes",
+      "label": "Man sizes",
+      "info": "Comma-separated fallback sizes used when the gift product has no size variants.",
+      "default": "Small, Medium, Large, XL, 2XL"
+    },
+    {
+      "type": "text",
+      "id": "free_gift_popup_cub_sizes",
+      "label": "Cub sizes",
+      "info": "Comma-separated fallback sizes used when the gift product has no size variants.",
+      "default": "1 years, 2 years, 3 years, 4 years, 5 years, 7 years"
     },
     {
       "type": "header",

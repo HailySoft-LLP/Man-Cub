@@ -1,25 +1,22 @@
 {%- liquid
   case localization.country.currency.iso_code
     when 'USD'
-      assign auto_free_cap_threshold = 20000
+      assign auto_free_cap_threshold = free_cap_threshold_usd | default: '200' | plus: 0 | times: 100
     when 'EUR'
-      assign auto_free_cap_threshold = 17500
+      assign auto_free_cap_threshold = free_cap_threshold_eur | default: '175' | plus: 0 | times: 100
     when 'CAD'
-      assign auto_free_cap_threshold = 30000
+      assign auto_free_cap_threshold = free_cap_threshold_cad | default: '300' | plus: 0 | times: 100
     when 'AED'
-      assign auto_free_cap_threshold = 75000
+      assign auto_free_cap_threshold = free_cap_threshold_aed | default: '750' | plus: 0 | times: 100
     else
-      assign auto_free_cap_threshold = 15000
+      assign auto_free_cap_threshold = free_cap_threshold_gbp | default: '150' | plus: 0 | times: 100
   endcase
+
+  assign auto_free_cap_success_msg = free_cap_success_message | default: 'Your free cap has been added to your cart'
+
   assign auto_free_cap_total = 0
-
   for item in cart.items
-    assign item_is_auto_free_cap = false
-    if item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true'
-      assign item_is_auto_free_cap = true
-    endif
-
-    unless item_is_auto_free_cap
+    unless item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true'
       assign auto_free_cap_total = auto_free_cap_total | plus: item.final_line_price
     endunless
   endfor
@@ -31,14 +28,14 @@
   endif
 -%}
 
-<div class="free-shipping-bar free-shipping-bar--loaded{% if auto_free_cap_remaining <= 0 %} free-shipping-bar--success{% endif %}" data-auto-free-cap-progress>
+<div class="free-shipping-bar free-shipping-bar--loaded{% if auto_free_cap_remaining <= 0 %} free-shipping-bar--success{% endif %}">
   <div class="inventory-counter__message-wrapper ff-body fs-body-75">
     {%- render 'icon', icon: 'package-closed' -%}
     <h4 class="free-shipping-bar__message">
       {%- if auto_free_cap_remaining > 0 -%}
         <span class="fs-body-bold">{{ auto_free_cap_remaining | money }}</span> away from free gift
       {%- else -%}
-        Your free cap has been added to your cart
+        {{ auto_free_cap_success_msg }}
       {%- endif -%}
     </h4>
   </div>

@@ -24,6 +24,7 @@
         },
         "announcement_yNepDA": {
           "type": "announcement",
+          "disabled": true,
           "settings": {
             "title": "<p>Free MAN Cap with orders over £150 / $200</p>",
             "title_mobile": "",

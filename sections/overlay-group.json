@@ -15,13 +15,37 @@
       "type": "quick-cart",
       "settings": {
         "enable_quick_cart": true,
+        "auto_free_cap_product": "socks-man-size",
+        "auto_free_cap_cub_product": "socks-cub-size",
+        "auto_free_cap_threshold_gbp": "150",
+        "auto_free_cap_threshold_usd": "200",
+        "auto_free_cap_threshold_eur": "175",
+        "auto_free_cap_threshold_cad": "300",
+        "auto_free_cap_threshold_aed": "750",
+        "auto_free_cap_threshold_other": "150",
+        "auto_free_cap_success_message": "Your free socks have been added to your cart.",
+        "free_gift_popup_enabled": true,
+        "free_gift_popup_heading": "YOU'VE UNLOCKED A FREE GIFT!",
+        "free_gift_popup_subtext": "Choose your size below and claim your free socks.",
+        "free_gift_popup_button": "Claim Free Gift",
+        "free_gift_popup_man_label": "MAN",
+        "free_gift_popup_cub_label": "CUB",
+        "free_gift_popup_man_sizes": "Small, Medium, Large, XL, 2XL",
+        "free_gift_popup_cub_sizes": "1 years, 2 years, 3 years, 4 years, 5 years, 7 years",
         "show_product_currency": true,
-        "promotion_text": "<p></p><p>Not sure where to start? <br/>Try these collections:</p>",
+        "continue_shopping_link": "shopify://collections",
+        "promotion_text": "Not sure where to start? Try these collections:",
         "collection_list": [],
         "collection_list_button_style": "btn--secondary"
       }
     },
-    "popup": { "type": "popup", "settings": {} }
+    "popup": {
+      "type": "popup",
+      "settings": {}
+    }
   },
-  "order": ["quick-cart", "popup"]
+  "order": [
+    "quick-cart",
+    "popup"
+  ]
 }

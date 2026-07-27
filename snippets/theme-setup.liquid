@@ -72,29 +72,6 @@
       productRecommendations: "{{ routes.product_recommendations_url }}",
       predictive_search_url: '{{ routes.predictive_search_url }}',
     },
-    autoFreeCap: {
-      {% liquid
-        assign auto_free_cap_product = all_products['cap-man-size']
-        assign auto_free_cap_variant_id = blank
-
-        if auto_free_cap_product != blank
-          assign auto_free_cap_variant_id = auto_free_cap_product.selected_or_first_available_variant.id
-        endif
-      %}
-      variantId: {% if auto_free_cap_variant_id != blank %}{{ auto_free_cap_variant_id | json }}{% else %}null{% endif %},
-      thresholdCents: 15000,
-      currentCurrency: {{ localization.country.currency.iso_code | json }},
-      thresholdsByCurrency: {
-        GBP: 15000,
-        USD: 20000,
-        EUR: 17500,
-        CAD: 30000,
-        AED: 75000
-      },
-      productHandle: 'cap-man-size',
-      propertyName: '_auto_free_cap',
-      legacyPropertyName: '_cart_free_gift'
-    },
     icons: {
       chevron: {{ chevron_icon | json }},
       close: {{ close_icon | json }},

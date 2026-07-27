@@ -62,13 +62,22 @@
         &ndash; {{ shop.name }}
       {%- endunless -%}
     {%- endcapture -%}
-    <title>{{ seo_title | strip }}</title>
+    
+    {% if template.name == 'collection' and collection.handle == 'all' %}
+      <title>All Father & Son Matching Outfits | MANCUB</title>
+    {% else %}
+      <title>{{ seo_title | strip }}</title>
+    {% endif %}
 
     {% render 'social-meta-tags' %}
 
     {% render 'theme-setup' %}
     {% render 'theme-setting-vars' %}
     {%- render 'theme-globals' -%}
+
+    {% if template.name == 'search' %}
+      <meta name="robots" content="noindex">
+    {% endif %}
 
     {{ content_for_header }}
   </head>

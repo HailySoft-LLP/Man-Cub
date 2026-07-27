@@ -10,14 +10,90 @@
   assign custom_color_value_map = custom_swatch_color_maps | split: ' | ' | last | split: ','
 -%}
 <style>
+  .product-grid .recommended-products__content {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .product-grid .recommended-products__content::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   .product-grid .recommended-products__slider-wrapper{
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 16px;
+    width: max-content;
   }
 
   .product-grid .recommended-products__slide {
-    flex: 0 0 calc(100% / {{ section.settings.columns }} - 16px); 
+    flex: 0 0 clamp(160px, 42vw, 260px);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .product-grid .product-item__media {
+    overflow: hidden !important;
+  }
+
+  .product-grid .product-item__text {
+    margin: 10px auto 6px;
+  }
+
+  .product-grid .product-item__product-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.35;
+    min-height: 2.7em;
+    font-size: clamp(11px, 1.1vw, 14px);
+  }
+
+  .product-grid .product-item__price {
+    line-height: 1.35;
+    margin-top: 4px;
+    font-size: clamp(12px, 1.05vw, 16px);
+  }
+
+  .product-grid .product-badge {
+    font-size: 10px;
+    line-height: 1.1;
+    padding: 0.25em 0.45em;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 719px) {
+    .product-grid .recommended-products__slider-wrapper {
+      gap: 12px;
+    }
+
+    .product-grid .recommended-products__slide {
+      flex-basis: clamp(145px, 68vw, 220px);
+    }
+
+    .product-grid .product-item__product-title {
+      font-size: 12px;
+      min-height: 2.8em;
+    }
+
+    .product-grid .product-item__price {
+      font-size: 13px;
+    }
+
+    .product-grid .product-badge {
+      font-size: 9px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
   }
 </style>
 <div
