@@ -15623,7 +15623,8 @@ body.header-transparent
     }
 .inventory-counter__message-wrapper{
   display:flex;
-  justify-content:center;
+  justify-content:flex-start;
+  align-items:flex-start;
   color:var(--color-text);
   visibility:hidden;
 }
@@ -15633,6 +15634,20 @@ body.header-transparent
     margin-top:3px;
     margin-right:10px;
   }
+.free-shipping-bar__message .free-shipping-bar__gift-claim-link{
+  display:inline;
+  margin-left:6px;
+  margin-top:0;
+  padding:0;
+  min-height:auto;
+  line-height:inherit;
+  vertical-align:baseline;
+  text-decoration:underline;
+  color:inherit;
+  font-size:inherit;
+  font-family:inherit;
+  white-space:nowrap;
+}
 .free-shipping-bar__bar{
   position:relative;
   height:4px;

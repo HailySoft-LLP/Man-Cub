@@ -13,9 +13,18 @@
   endcase
 
   assign auto_free_cap_success_msg = free_cap_success_message | default: 'Your free cap has been added to your cart'
+  assign auto_free_cap_eligible_msg = free_cap_eligible_message | default: 'You are eligible to claim free gift'
+  assign auto_free_cap_eligible_link_label = free_cap_eligible_link_label | default: 'Click here.'
+  assign auto_free_cap_popup_enabled = free_cap_popup_enabled | default: true
+  assign auto_free_cap_remaining_msg = free_cap_remaining_message | default: '[amount] away from free gift'
+  assign auto_free_cap_show_remaining_msg = free_cap_show_remaining_message | default: true
 
   assign auto_free_cap_total = 0
+  assign auto_free_cap_has_gift = false
   for item in cart.items
+    if item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true'
+      assign auto_free_cap_has_gift = true
+    endif
     unless item.properties['_auto_free_cap'] == 'true' or item.properties['_cart_free_gift'] == 'true'
       assign auto_free_cap_total = auto_free_cap_total | plus: item.final_line_price
     endunless
@@ -29,16 +38,36 @@
 -%}
 
 <div class="free-shipping-bar free-shipping-bar--loaded{% if auto_free_cap_remaining <= 0 %} free-shipping-bar--success{% endif %}">
-  <div class="inventory-counter__message-wrapper ff-body fs-body-75">
-    {%- render 'icon', icon: 'package-closed' -%}
-    <h4 class="free-shipping-bar__message">
-      {%- if auto_free_cap_remaining > 0 -%}
-        <span class="fs-body-bold">{{ auto_free_cap_remaining | money }}</span> away from free gift
-      {%- else -%}
-        {{ auto_free_cap_success_msg }}
-      {%- endif -%}
-    </h4>
-  </div>
+  {%- liquid
+    assign auto_free_cap_show_message_row = true
+    if auto_free_cap_remaining > 0 and auto_free_cap_show_remaining_msg == false
+      assign auto_free_cap_show_message_row = false
+    endif
+  -%}
+
+  {%- if auto_free_cap_show_message_row -%}
+    <div class="inventory-counter__message-wrapper ff-body fs-body-75">
+      {%- render 'icon', icon: 'package-closed' -%}
+      <h4 class="free-shipping-bar__message">
+        {%- if auto_free_cap_remaining > 0 -%}
+          {%- capture auto_free_cap_remaining_amount_html -%}<span class="fs-body-bold">{{ auto_free_cap_remaining | money }}</span>{%- endcapture -%}
+          {{ auto_free_cap_remaining_msg | replace: '[amount]', auto_free_cap_remaining_amount_html }}
+        {%- elsif auto_free_cap_has_gift -%}
+          {{ auto_free_cap_success_msg }}
+        {%- else -%}
+          <span class="free-shipping-bar__eligible-text">{{ auto_free_cap_eligible_msg }}</span>
+          {%- if auto_free_cap_popup_enabled -%}
+            <button
+              type="button"
+              class="free-shipping-bar__gift-claim-link btn btn--text-link"
+              data-free-gift-popup-open
+            >{{ auto_free_cap_eligible_link_label }}</button>
+          {%- endif -%}
+        {%- endif -%}
+      </h4>
+    </div>
+  {%- endif -%}
+
   <div class="free-shipping-bar__bar">
     <span class="free-shipping-bar__bar-progress" style="--progress-width: {{ auto_free_cap_progress }}%;"></span>
   </div>

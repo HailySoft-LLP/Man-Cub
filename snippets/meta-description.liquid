@@ -6,6 +6,14 @@
 
 {% assign meta_description_content = content | default: page_description | default: shop.name %}
 
+{% if template.name == 'search' %}
+  {% assign meta_description_content = 'Looking for a specific matching set? Search the MANCUB store to find premium matching father and son outfits, swimwear, and gifts. Find your perfect fit!' %}
+{% endif %}
+
+{% if template.name == 'cart' %}
+  {% assign meta_description_content = 'Ready to match with your mini-me? View your MANCUB shopping bag, review your sizes, and head to our secure checkout. Enjoy fast shipping on your order!' %}
+{% endif %}
+
 {% if meta_description_content != blank %}
   <meta name="description" content="{{ meta_description_content | escape }}">
 {% endif %}

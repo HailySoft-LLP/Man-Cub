@@ -54,8 +54,8 @@
       ],
       "settings": {
         "alignment": "center_center",
-        "heading": "Contact Us",
-        "heading_tag": "h2",
+        "heading": "Contact MANCUB",
+        "heading_tag": "h1",
         "heading_font_class": "fs-heading-2-base",
         "text": "<p>Let’s Talk Man to MANCUB</p><p>We’re here to help.</p>",
         "show_recaptcha_terms": true,

@@ -512,6 +512,15 @@
         if (e.key === 'Escape' && window.MCFreeGiftPopupOpen) closePopup(true);
       });
 
+      document.addEventListener('click', function (e) {
+        var trigger = e.target.closest('[data-free-gift-popup-open]');
+        if (!trigger) return;
+        e.preventDefault();
+        if (!window.MCFreeGiftPopupEnabled) return;
+        sessionStorage.removeItem(SESSION_KEY);
+        openPopup();
+      });
+
       document.addEventListener('cart:updated', function (e) {
         if (!window.MCFreeGiftPopupEnabled) return;
         if (e.detail && (e.detail.source === 'free-gift-popup' || e.detail.source === 'auto-free-cap')) return;

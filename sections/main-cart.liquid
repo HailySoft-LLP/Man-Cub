@@ -239,7 +239,19 @@
                 class="cart__footer-subtotal-wrapper {% if  cart.cart_level_discount_applications.size > 0 %}cart__footer-subtotal-wrapper--has-discount{% endif %}"
                 js-cart-footer-subtotal-wrapper
               >
-                {%- render 'cart-free-cap-progress' %}
+                {%- render 'cart-free-cap-progress',
+                  free_cap_threshold_gbp: section.settings.auto_free_cap_threshold_gbp,
+                  free_cap_threshold_usd: section.settings.auto_free_cap_threshold_usd,
+                  free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
+                  free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
+                  free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
+                  free_cap_success_message: section.settings.auto_free_cap_success_message,
+                  free_cap_eligible_message: section.settings.auto_free_cap_eligible_message,
+                  free_cap_eligible_link_label: section.settings.auto_free_cap_eligible_link_label,
+                  free_cap_remaining_message: section.settings.auto_free_cap_remaining_message,
+                  free_cap_show_remaining_message: section.settings.auto_free_cap_show_remaining_message,
+                  free_cap_popup_enabled: section.settings.free_gift_popup_enabled
+                -%}
 
                 {%- if cart.cart_level_discount_applications.size > 0 -%}
                   <ul class="cart__item-discounts">
@@ -316,7 +328,19 @@
         <div class="cart__empty-message supports-cookies">
           <h1 class="cart__empty-message-heading ff-heading fs-heading-2-base">{{ 'cart.general.empty' | t }}</h1>
           <p class="cart__empty-message-text fs-body-100">{{ 'cart.general.empty_message' | t }}</p>
-          {%- render 'cart-free-cap-progress' %}
+          {%- render 'cart-free-cap-progress',
+            free_cap_threshold_gbp: section.settings.auto_free_cap_threshold_gbp,
+            free_cap_threshold_usd: section.settings.auto_free_cap_threshold_usd,
+            free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
+            free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
+            free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
+            free_cap_success_message: section.settings.auto_free_cap_success_message,
+            free_cap_eligible_message: section.settings.auto_free_cap_eligible_message,
+            free_cap_eligible_link_label: section.settings.auto_free_cap_eligible_link_label,
+            free_cap_remaining_message: section.settings.auto_free_cap_remaining_message,
+            free_cap_show_remaining_message: section.settings.auto_free_cap_show_remaining_message,
+            free_cap_popup_enabled: section.settings.free_gift_popup_enabled
+          -%}
           {%- if section.settings.collection_list != blank -%}
             {%- if section.settings.promotion_text != blank -%}
               <div class="cart__empty-state-promot-text rte ff-body fs-body-100">
@@ -376,6 +400,77 @@
       "type": "checkbox",
       "id": "show_product_currency",
       "label": "t:sections.shared.cart.settings.product_items.show_product_currency.label",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Auto free gift"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_gbp",
+      "label": "GBP threshold",
+      "default": "150"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_usd",
+      "label": "USD threshold",
+      "default": "200"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_eur",
+      "label": "EUR threshold",
+      "default": "175"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_cad",
+      "label": "CAD threshold",
+      "default": "300"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_threshold_aed",
+      "label": "AED threshold",
+      "default": "750"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_success_message",
+      "label": "Free gift added message",
+      "default": "Your free cap has been added to your cart"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_eligible_message",
+      "label": "Eligible message",
+      "default": "You are eligible to claim free gift"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_eligible_link_label",
+      "label": "Eligible message link label",
+      "default": "Click here."
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_remaining_message",
+      "label": "Remaining amount message",
+      "info": "Use [amount] as placeholder. Example: [amount] away from your gift.",
+      "default": "[amount] away from free gift"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_free_cap_show_remaining_message",
+      "label": "Show remaining amount message",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "free_gift_popup_enabled",
+      "label": "Enable free gift popup from message",
       "default": true
     },
     {

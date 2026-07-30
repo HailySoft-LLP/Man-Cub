@@ -107,7 +107,12 @@
                 free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
                 free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
                 free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
-                free_cap_success_message: section.settings.auto_free_cap_success_message
+                free_cap_success_message: section.settings.auto_free_cap_success_message,
+                free_cap_eligible_message: section.settings.auto_free_cap_eligible_message,
+                free_cap_eligible_link_label: section.settings.auto_free_cap_eligible_link_label,
+                free_cap_remaining_message: section.settings.auto_free_cap_remaining_message,
+                free_cap_show_remaining_message: section.settings.auto_free_cap_show_remaining_message,
+                free_cap_popup_enabled: section.settings.free_gift_popup_enabled
               -%}
 
               {%- assign rendered_bundle_ids_qc = '' -%}
@@ -348,7 +353,12 @@
               free_cap_threshold_eur: section.settings.auto_free_cap_threshold_eur,
               free_cap_threshold_cad: section.settings.auto_free_cap_threshold_cad,
               free_cap_threshold_aed: section.settings.auto_free_cap_threshold_aed,
-              free_cap_success_message: section.settings.auto_free_cap_success_message
+              free_cap_success_message: section.settings.auto_free_cap_success_message,
+              free_cap_eligible_message: section.settings.auto_free_cap_eligible_message,
+              free_cap_eligible_link_label: section.settings.auto_free_cap_eligible_link_label,
+              free_cap_remaining_message: section.settings.auto_free_cap_remaining_message,
+              free_cap_show_remaining_message: section.settings.auto_free_cap_show_remaining_message,
+              free_cap_popup_enabled: section.settings.free_gift_popup_enabled
             -%}
             {%- if settings.collection_list != blank -%}
               {%- if settings.promotion_text != blank -%}
@@ -464,6 +474,31 @@
       "id": "auto_free_cap_success_message",
       "label": "Free gift added message",
       "default": "Your free cap has been added to your cart"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_eligible_message",
+      "label": "Eligible message",
+      "default": "You are eligible to claim free gift"
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_eligible_link_label",
+      "label": "Eligible message link label",
+      "default": "Click here."
+    },
+    {
+      "type": "text",
+      "id": "auto_free_cap_remaining_message",
+      "label": "Remaining amount message",
+      "info": "Use [amount] as placeholder. Example: [amount] away from your gift.",
+      "default": "[amount] away from free gift"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_free_cap_show_remaining_message",
+      "label": "Show remaining amount message",
+      "default": true
     },
     {
       "type": "header",
