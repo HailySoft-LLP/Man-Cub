@@ -1,0 +1,145 @@
+{%- comment -%}
+  Orphan Upsell — Tag-based flow
+  ─────────────────────────────────────────────────────────────────
+  HOW TO SET UP:
+  1. Add tags to products inside your "upsell-collection".
+     Tag format: {role}-{size_lowercase_no_spaces}
+     Examples:
+       man-small   man-medium   man-large   man-xl   man-2xl
+       cub-6-12months   cub-1years   cub-2years   cub-3years ...
+  2. Each tagged product must have these metafields already set:
+       custom.man_product  → linked Man orphan product
+       custom.kid_product  → linked Cub orphan product
+  3. The code finds the exact size variant inside that orphan product
+     and shows it as the upsell card.
+  4. If multiple products share the same tag, one is picked randomly
+     on each page load.
+  ─────────────────────────────────────────────────────────────────
+
+Get Product Variant Size i.e Small, 2years
+Get list of main products by tags UPSELL_SMALL, UPSELL_2YEARS
+HOW MAIN PRODUCT
+{% endcomment %}
+
+{% assign upsell_collection = collections['upsell-collection'] %}
+
+{% assign required_tags = '' %}
+
+{%- for item in cart.items -%}
+  {%- for option in item.options_with_values -%}
+    {% assign option_value = option.value | upcase | replace: ' ', '' %}
+    {% assign tag = 'UPSELL_' | append: option_value %}
+
+    {% unless required_tags contains tag %}
+      {% assign required_tags = required_tags | append: tag | append: ',' %}
+    {% endunless %}
+  {%- endfor -%}
+{%- endfor -%}
+
+{% assign required_tags = required_tags | split: ',' %}
+{% assign is_slider = true %}
+
+<div class="cross-sells" data-cross-sells data-position="{{ position }}">
+    <div class="cross-sells__heading ff-heading fs-heading-6-base">{{ settings.cross_sells_heading }}</div>
+    <div class="cross-sells__items {% if is_slider %}swiper{% endif %}" data-cross-sells-slider="{{ is_slider }}">
+      {% if is_slider %}<div class="cross-sells__slider-inner swiper-wrapper">{% endif %}
+
+
+  {% for product in upsell_collection.products %}
+    {% assign show_product = false %}
+
+    {% for tag in required_tags %}
+      {% if tag != blank and product.tags contains tag %}
+        {% assign show_product = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if show_product %}
+        <div class="cross-sells__item {% if is_slider %}swiper-slide{% endif %}">
+          {%- if settings.cross_sells_show_thumbnails -%}
+            <div class="cross-sells__item-image">
+              <a href="{{ product.url }}" class="cross-sells__item-link">
+                {%- render 'image',
+                  image: product.featured_image,
+                  sizes: '64px',
+                  prioritize_loading: true,
+                  aspect_ratio: settings.cart_item_aspect_ratio,
+                  include_placeholder: true
+                -%}
+              </a>
+            </div>
+          {%- endif -%}
+          <div class="cross-sells__item-content">
+            <div class="cross-sells__item-details ff-body fs-body-75">
+              <h4 class="cross-sells__item-title fs-body-75">
+                <a href="{{ product.url }}">{{ product.title }}</a>
+              </h4>
+              <div class="cross-sells__item-price-wrapper">
+                {% if product.compare_at_price > product.price %}
+                  <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+                  <s class="t-subdued">
+                    {{- product.compare_at_price | money -}}
+                    {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
+                  </s>
+
+                  {% if product.price_varies %}
+                    {%- assign sale_price = product.price | money -%}
+
+                    <div class="sale">
+                      {{ 'products.product.on_sale_from_html' | t: price: sale_price }}
+                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
+                    </div>
+                  {% else %}
+                    <div class="sale">
+                      {{ product.price | money -}}
+                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif %}
+                    </div>
+                  {% endif %}
+                {% else %}
+                  {% if product.price_varies %}
+                    {%- assign price = product.price | money -%}
+                    {{ 'products.product.from_lowest_price_html' | t: lowest_price: price }}
+                    {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
+                  {% else %}
+                    <span class="cross-sells__item-price">
+                      {{- product.price | money -}}
+                      {%- if section.settings.show_product_currency %} {{ cart.currency.iso_code }}{% endif -%}
+                    </span>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+            <div class="cross-sells__item-button">
+              <a href="{{ product.url }}" class="cross-sells__item-add btn btn--tertiary btn--x-small">
+                VIEW
+              </a>
+            </div>
+          </div>
+        </div>
+
+    {% endif %}
+
+  {% endfor %}
+      
+      {% if is_slider %}
+        </div>
+        <button
+          type="button"
+          class="slider-nav-button slider-nav-button-prev"
+          title="{{ 'general.accessibility.previous' | t }}"
+          data-prev
+        >
+          {% render 'icon', icon: 'chevron' %}
+        </button>
+        <button
+          type="button"
+          class="slider-nav-button slider-nav-button-next"
+          title="{{ 'general.accessibility.next' | t }}"
+          data-next
+        >
+          {% render 'icon', icon: 'chevron' %}
+        </button>
+      {% endif %}
+    </div>
+  </div>

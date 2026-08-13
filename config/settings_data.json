@@ -75,7 +75,7 @@
     "enable_free_shipping_bar": false,
     "free_shipping_threshold": "100",
     "enable_cross_sells": false,
-    "cross_sells_heading": "Last chance to save",
+    "cross_sells_heading": "Exclusive One-Time Offer",
     "cross_sells_recommendations_type": "metafield",
     "collection": "sale",
     "quick_search_product_style": "columns",

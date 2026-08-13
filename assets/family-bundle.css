@@ -559,3 +559,74 @@
     text-decoration: line-through;
     color: var(--color-products-sale-price);
 }
+
+/* ── Orphan Upsell — cart drawer cards ── */
+.orphan-upsell {
+  padding-top: var(--spacing-7, 28px);
+  margin-bottom: var(--spacing-5, 20px);
+  border-top: 1px solid var(--color-border);
+}
+
+.orphan-upsell__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+}
+
+.orphan-upsell__card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3, 12px);
+  padding: var(--spacing-3, 12px);
+  background: var(--color-background-meta);
+}
+
+.orphan-upsell__image {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-background);
+}
+
+.orphan-upsell__image img,
+.orphan-upsell__image .placeholder-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.orphan-upsell__content {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.orphan-upsell__title {
+  margin: 0;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.orphan-upsell__size {
+  margin: 3px 0 0;
+}
+
+.orphan-upsell__add {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .orphan-upsell__card {
+    gap: var(--spacing-2, 8px);
+    padding: var(--spacing-2, 8px);
+  }
+
+  .orphan-upsell__image {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+}

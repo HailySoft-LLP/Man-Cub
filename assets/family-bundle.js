@@ -695,17 +695,17 @@ window._familyBundleLoaded = true;
             // Theme has re-rendered — now open the drawer and init buttons
             var cartIcon = document.querySelector('[data-js-cart-icon]');
             if (cartIcon) cartIcon.click();
-            initBundleCartButtons();
+            initCartEnhancements();
           });
           addObserver.observe(qcContainer, { childList: true, subtree: false });
           // Fallback if observer doesn't fire within 1s (e.g., quick cart disabled)
           setTimeout(function() {
             addObserver.disconnect();
-            initBundleCartButtons();
+            initCartEnhancements();
           }, 1000);
         } else {
           // No quick cart container — just re-init buttons
-          setTimeout(function() { initBundleCartButtons(); }, 300);
+          setTimeout(function() { initCartEnhancements(); }, 300);
         }
 
         // Reset buttons
@@ -828,6 +828,53 @@ window._familyBundleLoaded = true;
     });
   }
 
+  function initOrphanUpsellButtons() {
+    document.querySelectorAll('[data-orphan-upsell-add]').forEach(function(btn) {
+      if (btn._orphanUpsellInit) return;
+      btn._orphanUpsellInit = true;
+
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var variantId = btn.getAttribute('data-variant-id');
+        if (!variantId || btn.disabled) return;
+
+        var originalLabel = btn.getAttribute('data-label') || btn.textContent.trim();
+        btn.disabled = true;
+        btn.classList.add('btn--loading');
+        btn.textContent = 'Adding...';
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({ items: [{ id: Number(variantId), quantity: 1 }] })
+        })
+        .then(function(response) {
+          return response.json().then(function(data) {
+            if (!response.ok) throw new Error(data.description || 'Could not add item.');
+            return data;
+          });
+        })
+        .then(function() {
+          document.dispatchEvent(new CustomEvent('apps:product-added-to-cart', {
+            detail: { source: 'orphan-upsell' }
+          }));
+        })
+        .catch(function(err) {
+          btn.disabled = false;
+          btn.classList.remove('btn--loading');
+          btn.textContent = originalLabel;
+          console.error('[Orphan Upsell] Failed to add:', err);
+        });
+      });
+    });
+  }
+
+  function initCartEnhancements() {
+    initBundleCartButtons();
+    initOrphanUpsellButtons();
+  }
+
   /* ================================================================
    *  SECTION C — Auto re-init when theme re-renders cart content
    *  Watches for DOM changes in quick cart and cart page
@@ -838,7 +885,7 @@ window._familyBundleLoaded = true;
   var _reinitTimer = null;
   function debouncedReinit() {
     clearTimeout(_reinitTimer);
-    _reinitTimer = setTimeout(initBundleCartButtons, 150);
+    _reinitTimer = setTimeout(initCartEnhancements, 150);
   }
 
   function watchCartChanges() {
@@ -862,18 +909,18 @@ window._familyBundleLoaded = true;
   }
 
   // Expose for external calls
-  window.initBundleRemoveButtons = initBundleCartButtons;
+  window.initBundleRemoveButtons = initCartEnhancements;
 
   // ── INIT ──
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initProductBundle();
-      initBundleCartButtons();
+      initCartEnhancements();
       watchCartChanges();
     });
   } else {
     initProductBundle();
-    initBundleCartButtons();
+    initCartEnhancements();
     watchCartChanges();
   }
 
