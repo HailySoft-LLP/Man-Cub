@@ -165,8 +165,18 @@
             {% endif %}
           "
           data-index="option{{ forloop.index }}"
+          data-template="{{product.template_suffix }}"
         >
           {%- for value in option.values -%}
+            {% assign matched_variant = nil %}
+
+            {% for variant in product.variants %}
+              {% if variant.options contains value %}
+                {% assign matched_variant = variant %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            
             <option
               data-value-handle="{{ value | handleize }}--{{ forloop.index }}"
               value="{{ value | escape }}"
@@ -174,7 +184,11 @@
                 selected="selected"
               {%- endif -%}
             >
-              {{ value }}
+              {% if product.template_suffix == 'gift-card' and matched_variant  %}
+                {{ matched_variant.price | money }}
+              {% else %}
+                {{ value }}
+              {% endif %}
             </option>
           {%- endfor -%}
         </select>
@@ -284,8 +298,10 @@
           <div class="product__label-wrapper">
             <label class="product__label fs-body-100" for="option{{ option.position }}">
               {{ option.name }}:
-              <span class="t-opacity-70" data-selected-value-for-option data-option-name="option{{ option.position }}">
-                {{- option.selected_value -}}
+              <span class="t-opacity-70" {% unless product.template_suffix == 'gift-card' %} data-selected-value-for-option {% endunless %} data-option-name="option{{ option.position }}">
+                {% unless product.template_suffix == 'gift-card' %}
+                  {{- option.selected_value -}}
+                {% endunless %}
               </span>
             </label>
           </div>

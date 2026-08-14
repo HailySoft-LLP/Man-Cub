@@ -75,7 +75,7 @@
     "enable_free_shipping_bar": false,
     "free_shipping_threshold": "100",
     "enable_cross_sells": false,
-    "cross_sells_heading": "Exclusive One-Time Offer",
+    "cross_sells_heading": "Last chance to save",
     "cross_sells_recommendations_type": "metafield",
     "collection": "sale",
     "quick_search_product_style": "columns",
@@ -110,6 +110,11 @@
       },
       "7280966411886983154": {
         "type": "shopify://apps/monk/blocks/app-embed/e949adb6-87ca-4b97-8f31-0e51bf507f2d",
+        "disabled": false,
+        "settings": {}
+      },
+      "855628211100114053": {
+        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
         "disabled": false,
         "settings": {}
       }

@@ -75,17 +75,8 @@
     {% render 'theme-setting-vars' %}
     {%- render 'theme-globals' -%}
 
-    {% liquid
-      assign should_noindex = false
-      if template.name == 'search'
-        assign should_noindex = true
-      endif
-      if request.path == '/blog/news' or request.path == '/blogs/blog'
-        assign should_noindex = true
-      endif
-    %}
-    {% if should_noindex %}
-      <meta name="robots" content="noindex,follow">
+    {% if template.name == 'search' %}
+      <meta name="robots" content="noindex">
     {% endif %}
 
     {{ content_for_header }}

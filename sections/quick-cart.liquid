@@ -266,7 +266,6 @@
                   </div>
                 {%- endif -%}
               {%- endfor -%}
-              {%- render 'orphan-upsell-cart', cart: cart -%}
               {%- if settings.enable_cross_sells -%}
                 {%- render 'cross-sells', cart: cart, display: settings.quick_cart_cross_sells_display -%}
               {%- endif -%}

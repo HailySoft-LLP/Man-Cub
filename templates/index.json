@@ -60,9 +60,17 @@
         "heading_DmXPWP": {
           "type": "heading",
           "settings": {
-            "title": "Father & Son Matching Clothes",
+            "title": "MANCUB",
             "heading_tag": "h1",
             "heading_font_class": "fs-heading-display-3"
+          }
+        },
+        "subheading_pMWycb": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Father & Son Matching Clothing",
+            "subheading_tag": "h2",
+            "subheading_font_class": "fs-heading-5-base"
           }
         },
         "button_4dL4JX": {
@@ -76,6 +84,7 @@
       },
       "block_order": [
         "heading_DmXPWP",
+        "subheading_pMWycb",
         "button_4dL4JX"
       ],
       "custom_css": [],

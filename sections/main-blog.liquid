@@ -3,10 +3,6 @@
 {%- liquid
   assign paginate_by = section.settings.article_per_page
   assign article_categories = settings.article_categories | downcase
-  assign is_legacy_blog_handle = false
-  if blog.handle == 'blog' or blog.handle == 'news'
-    assign is_legacy_blog_handle = true
-  endif
 -%}
 
 {%- if section.settings.show_tag_nav and blog.all_tags.size > 0 -%}
@@ -119,12 +115,6 @@
           </li>
         {%- endfor -%}
       </ul>
-
-      {%- if blog.articles_count == 0 and is_legacy_blog_handle -%}
-        <div class="blog__empty-state fs-body-200 ta-c" style="padding: 1.5rem 0 0;">
-          <p>We are updating this blog section with new stories and style guides.</p>
-        </div>
-      {%- endif -%}
 
       <div class="blog__pagination animation animation--blog-pagination">
         {% if paginate.pages > 1 %}

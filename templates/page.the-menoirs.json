@@ -18,14 +18,43 @@
         "custom_content_width": 700
       }
     },
+    "rich_text_XHtzzf": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_QUxWj7": {
+          "type": "heading",
+          "settings": {
+            "title": "The Menoirs: Dad Style, Parenting & Family Life",
+            "heading_tag": "h1",
+            "heading_font_class": "fs-heading-2-base"
+          }
+        }
+      },
+      "block_order": [
+        "heading_QUxWj7"
+      ],
+      "name": "t:sections.rich_text.presets.name",
+      "settings": {
+        "alignment": "center_center",
+        "bg_color": "",
+        "text_color": "",
+        "custom_font_family": "",
+        "custom_font_size": 0,
+        "enable_animation": true,
+        "divider_style": "none",
+        "section_padding": "section--vertical-padding-top-bottom",
+        "content_width": "custom",
+        "custom_content_width": 700
+      }
+    },
     "blog_posts_V4m69j": {
       "type": "blog-posts",
       "name": "t:sections.blog_posts.presets.name",
       "settings": {
         "layout": "horizontal",
         "alternate_layout": false,
-        "heading": "The Menoirs: Dad Style, Parenting & Family Life",
-        "heading_tag": "h1",
+        "heading": "",
+        "heading_tag": "h2",
         "subheading": "",
         "link": "",
         "link_text": "",
@@ -48,6 +77,7 @@
   },
   "order": [
     "main",
+    "rich_text_XHtzzf",
     "blog_posts_V4m69j"
   ]
 }

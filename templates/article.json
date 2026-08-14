@@ -53,6 +53,9 @@
         "social_share",
         "pagination"
       ],
+      "custom_css": [
+        ".rte img, .shopify-policy__body img {height: auto;}"
+      ],
       "settings": {
         "content_width": "custom",
         "custom_content_width": 1000,
@@ -81,6 +84,8 @@
       ],
       "disabled": true,
       "settings": {
+        "layout": "grid",
+        "alternate_layout": false,
         "heading": "Featured stories",
         "heading_tag": "h2",
         "subheading": "",

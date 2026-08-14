@@ -235,3 +235,8 @@ html.do-anim .animation.animation--blog .article-item__content-inner > *{
     var(--delay-amount) * var(--delay-offset-multiplier, 0)
   );
   }
+
+
+ img{
+    height: auto !important;
+  }
